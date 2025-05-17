@@ -55,7 +55,9 @@ public class Product extends BaseTimeEntity {
     @Column(name = "category", nullable = false)
     private String category;
 
-    // 이미지는 일단 나중에
+    // 이미지
+    @Column(name = "image_url", nullable = false)
+    private String image;
 
 
 }
