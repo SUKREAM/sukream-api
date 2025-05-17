@@ -1,21 +1,35 @@
 package com.sukream.sukream.domains.bidder.entity;
 
+import com.sukream.sukream.commons.jpa.BaseTimeEntity;
 import com.sukream.sukream.domains.product.entity.Product;
 import jakarta.persistence.*;
-
-import java.time.LocalDateTime;
+import lombok.*;
 
 @Entity
-public class Bidder {
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
+@Table(name = "bidder")
+public class Bidder extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    @Column(name = "bidder_id")
+    private Long id;
+
+    @Column(nullable = false)
     private Integer price;
-    private LocalDateTime submittedOn;
-    private Boolean isAwarded = false; // true면 낙찰
+
+    @Column(name = "is_awarded", nullable = false)
+    private Boolean isAwarded = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    @Column(nullable = false)
+    private String nickname;
+
 }
