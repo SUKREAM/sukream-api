@@ -15,7 +15,7 @@ import java.util.Set;
 @Entity
 @Builder
 @Comment("사용자 테이블")
-public class User extends BaseTimeEntity {
+public class Users extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

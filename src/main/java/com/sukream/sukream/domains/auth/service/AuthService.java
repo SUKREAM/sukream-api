@@ -6,7 +6,7 @@ import com.sukream.sukream.domains.auth.domain.response.SocialOAuthResponse;
 import com.sukream.sukream.domains.auth.domain.response.TokenResponse;
 import com.sukream.sukream.domains.auth.repository.UserInfoRepository;
 import com.sukream.sukream.domains.auth.security.JwtTokenProvider;
-import com.sukream.sukream.domains.user.domain.entity.User;
+import com.sukream.sukream.domains.user.domain.entity.Users;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
@@ -37,8 +37,8 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
 
     public TokenResponse login(HttpServletResponse response, LoginRequest request){
-        User userInfo = userInfoRepository.findUserByEmail(request.getEmail()).get();
-        return this.makeToken(response, userInfo);
+        Users usersInfo = userInfoRepository.findUsersByEmail(request.getEmail()).get();
+        return this.makeToken(response, usersInfo);
     }
 
     public Response doVerification(HttpServletResponse response, String provider, String accessToken){
@@ -73,26 +73,26 @@ public class AuthService {
         if(!errorResponse.get().isSuccess())
             return errorResponse.get();
 
-        User userInfo;
+        Users usersInfo;
         assert oAuthResponse != null;
         switch (provider) {
-            case GOOGLE -> userInfo = userInfoRepository.findUserByEmail(oAuthResponse.getEmail()).get();
+            case GOOGLE -> usersInfo = userInfoRepository.findUsersByEmail(oAuthResponse.getEmail()).get();
             case NAVER -> {
                 assert oAuthResponse.getResponse() != null;
-                userInfo = userInfoRepository.findUserByEmail(oAuthResponse.getResponse().getEmail()).get();
+                usersInfo = userInfoRepository.findUsersByEmail(oAuthResponse.getResponse().getEmail()).get();
             }
             default -> throw new RuntimeException();
         }
 
-        if (userInfo == null)
+        if (usersInfo == null)
             return Response.error(RESOURCE_NOT_FOUND);
 
-        return this.makeToken(response, userInfo);
+        return this.makeToken(response, usersInfo);
     }
 
-    private TokenResponse makeToken(HttpServletResponse response, User userInfo){
-        Claims claims = Jwts.claims().setSubject(userInfo.getEmail());
-        claims.put(NAME, userInfo.getName());
+    private TokenResponse makeToken(HttpServletResponse response, Users usersInfo){
+        Claims claims = Jwts.claims().setSubject(usersInfo.getEmail());
+        claims.put(NAME, usersInfo.getName());
 
         String accessToken = jwtTokenProvider.createAccessToken(claims);
         String refreshToken = jwtTokenProvider.createRefreshToken(claims);

@@ -19,7 +19,7 @@ public class UserConfiguration extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Users users;
 
     @Column(name = "refresh_token", length = 500)
     @Comment("사용자 리프레시 토큰")

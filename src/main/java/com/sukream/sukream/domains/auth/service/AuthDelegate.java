@@ -21,7 +21,7 @@ public class AuthDelegate implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return userRepository.findUserByEmail(email)
+        return userRepository.findUsersByEmail(email)
                 .map(UserPrincipal::from)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
     }

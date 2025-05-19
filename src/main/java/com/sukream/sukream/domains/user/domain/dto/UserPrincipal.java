@@ -1,6 +1,6 @@
 package com.sukream.sukream.domains.user.domain.dto;
 
-import com.sukream.sukream.domains.user.domain.entity.User;
+import com.sukream.sukream.domains.user.domain.entity.Users;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,38 +11,38 @@ import java.util.stream.Collectors;
 
 public class UserPrincipal implements UserDetails {
 
-    private final User user;
+    private final Users users;
 
 
-    public UserPrincipal(User user, Set<GrantedAuthority> authorities) {
-        this.user = user;
+    public UserPrincipal(Users users, Set<GrantedAuthority> authorities) {
+        this.users = users;
     }
 
-    public User getUser() {
-        return user;
+    public Users getUser() {
+        return users;
     }
 
-    public static UserPrincipal from(User user) {
+    public static UserPrincipal from(Users users) {
         Set<GrantedAuthority> authorities = Set.of(new SimpleGrantedAuthority("ROLE_USER"));
-        return new UserPrincipal(user, authorities);
+        return new UserPrincipal(users, authorities);
     }
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getRoles().stream()
+        return users.getRoles().stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return users.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return users.getEmail();
     }
 
     @Override
@@ -62,6 +62,6 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.isActive();
+        return users.isActive();
     }
 }
