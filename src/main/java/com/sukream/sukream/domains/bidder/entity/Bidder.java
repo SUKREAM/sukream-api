@@ -4,6 +4,7 @@ import com.sukream.sukream.commons.jpa.BaseTimeEntity;
 import com.sukream.sukream.domains.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.*;
+import com.sukream.sukream.domains.user.domain.entity.User;
 
 @Entity
 @Getter
@@ -17,6 +18,10 @@ public class Bidder extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bidder_id")
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private Integer price;
@@ -36,7 +41,8 @@ public class Bidder extends BaseTimeEntity {
     private String nickname;
 
     @Builder
-    public Bidder(Integer price, Boolean isAwarded, BidderStatus status, Product product, String nickname) {
+    public Bidder(User user, Integer price, Boolean isAwarded, BidderStatus status, Product product, String nickname) {
+        this.user = user;
         this.price = price;
         this.isAwarded = isAwarded == null ? false : isAwarded;
         this.status = status == null ? BidderStatus.PENDING : status;
