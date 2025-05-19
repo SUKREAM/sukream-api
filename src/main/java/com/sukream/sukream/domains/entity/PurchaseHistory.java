@@ -1,4 +1,4 @@
-package com.sukream.sukream.mypage.domain.entity;
+package com.sukream.sukream.domains.entity;
 
 import jakarta.persistence.Entity;
 
