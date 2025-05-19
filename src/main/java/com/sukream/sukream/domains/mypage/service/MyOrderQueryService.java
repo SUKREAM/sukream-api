@@ -3,7 +3,7 @@ package com.sukream.sukream.domains.mypage.service;
 import com.sukream.sukream.domains.bidder.entity.Bidder;
 import com.sukream.sukream.domains.bidder.repository.BidderRepository;
 import com.sukream.sukream.domains.mypage.domain.dto.OrderResponseDto;
-import com.sukream.sukream.domains.user.domain.entity.User;
+import com.sukream.sukream.domains.user.domain.entity.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import java.util.List;
 public class MyOrderQueryService {
     private final BidderRepository bidderRepository;
 
-    public List<OrderResponseDto> getMyOrders(User user) {
+    public List<OrderResponseDto> getMyOrders(Users user) {
         List<Bidder> allBids = bidderRepository.findAllByUser(user);
         List<OrderResponseDto> result = new ArrayList<>();
 

@@ -24,7 +24,8 @@ public class ProductService {
     @Transactional
     public Long createProduct(AddProductRequest requestDto) {
         Product product = Product.builder()
-                .sellerId(requestDto.getSellerId())
+                // TODO : sellerId
+//                .sellerId(requestDto.getSellerId())
                 .title(requestDto.getTitle())
                 .description(requestDto.getDescription())
                 .minPrice(requestDto.getMinPrice())

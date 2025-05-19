@@ -5,7 +5,7 @@ import com.sukream.sukream.domains.product.dto.UpdateProductRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import com.sukream.sukream.domains.user.domain.entity.User;
+import com.sukream.sukream.domains.user.domain.entity.Users;
 
 import java.time.LocalDateTime;
 
@@ -24,7 +24,7 @@ public class Product extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", updatable = false)
-    private User owner;
+    private Users owner;
 
     @Column(name = "min_price", nullable = false)
     private int minPrice;
