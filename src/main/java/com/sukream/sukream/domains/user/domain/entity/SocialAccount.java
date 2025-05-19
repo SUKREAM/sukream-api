@@ -23,7 +23,7 @@ public class SocialAccount extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Users users;
 
     @NotNull
     @Column(name = "social_provider", nullable = false)
@@ -54,13 +54,13 @@ public class SocialAccount extends BaseTimeEntity {
 
     @Builder(builderMethodName = "innerBuilder")
     private SocialAccount(
-            User user,
+            Users users,
             SocialProvider socialProvider,
             String socialProviderId,
             String email,
             Gender gender,
             LocalDate birth) {
-        this.user = user;
+        this.users = users;
         this.socialProvider = socialProvider;
         this.socialProviderId = socialProviderId;
         this.email = email;
