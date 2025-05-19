@@ -1,11 +1,9 @@
 package com.sukream.sukream.domains.product.entity;
 
 import com.sukream.sukream.commons.jpa.BaseTimeEntity;
+import com.sukream.sukream.domains.product.dto.UpdateProductRequest;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
+import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -13,7 +11,9 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // 기본 생성자
+@AllArgsConstructor // 모든 필드 생성자
+@Builder
 public class Product extends BaseTimeEntity {
 
     @Id
@@ -58,6 +58,22 @@ public class Product extends BaseTimeEntity {
     // 이미지
     @Column(name = "image_url", nullable = false)
     private String image;
+
+    // 오픈채팅방 링크
+    @Column(name = "chat_link")
+    private String chatLink;
+
+    public void updateProduct(UpdateProductRequest requestDto) {
+        this.title = requestDto.getTitle();
+        this.description = requestDto.getDescription();
+        this.minPrice = requestDto.getMinPrice();
+        this.maxPrice = requestDto.getMaxPrice();
+        this.category = requestDto.getCategory();
+        this.bidUnit = requestDto.getBidUnit();
+        this.deadline = requestDto.getDeadline();
+        this.image = requestDto.getImage();
+        this.chatLink = requestDto.getChatLink();
+    }
 
 
 }
