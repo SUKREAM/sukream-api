@@ -1,15 +1,19 @@
 package com.sukream.sukream.domains.bidder.dto.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class AwardBidderResponse {
 
     private String message;
     private AwardedBidderInfo awardedBidder;
 
     @Getter
-    @Setter
+    @Builder
+    @AllArgsConstructor
     public static class AwardedBidderInfo {
         private Long bidderId;
         private String nickname;

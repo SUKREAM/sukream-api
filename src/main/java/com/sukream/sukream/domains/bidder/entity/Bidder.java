@@ -7,7 +7,6 @@ import lombok.*;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
@@ -23,7 +22,7 @@ public class Bidder extends BaseTimeEntity {
     private Integer price;
 
     @Column(name = "is_awarded", nullable = false)
-    private Boolean isAwarded = false;
+    private Boolean isAwarded;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
@@ -32,4 +31,16 @@ public class Bidder extends BaseTimeEntity {
     @Column(nullable = false)
     private String nickname;
 
+    @Builder
+    public Bidder(Integer price, Boolean isAwarded, Product product, String nickname) {
+        this.price = price;
+        this.isAwarded = isAwarded == null ? false : isAwarded;
+        this.product = product;
+        this.nickname = nickname;
+    }
+
+    // 낙찰 여부 변경 등 필요한 비즈니스 메서드만 제공
+    public void award() {
+        this.isAwarded = true;
+    }
 }
