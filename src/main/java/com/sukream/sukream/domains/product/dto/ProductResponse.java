@@ -17,6 +17,8 @@ public class ProductResponse {
     private int maxPrice;
     private String category;
     private int bidUnit;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private LocalDateTime deadline;
     private String image;
     private String chatLink;
@@ -34,6 +36,8 @@ public class ProductResponse {
                 .maxPrice(product.getMaxPrice())
                 .category(product.getCategory())
                 .bidUnit(product.getBidUnit())
+                .createdAt(product.getCreatedAt())
+                .updatedAt(product.getUpdatedAt())
                 .deadline(product.getDeadline())
                 .image(product.getImage())
                 .chatLink(product.getChatLink())

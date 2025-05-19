@@ -1,20 +1,23 @@
 package com.sukream.sukream.domains.product.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor // 기본 생성자 추가
 @Getter
-public class ProductRequest {
-    private Long sellerId;
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UpdateProductRequest {
     private String title;
     private String description;
-    private int minPrice;
-    private int maxPrice;
+    private Integer minPrice;
+    private Integer maxPrice;
     private String category;
-    private int bidUnit;
+    private Integer bidUnit;
     private LocalDateTime deadline;
     private String image;
     private String chatLink;
