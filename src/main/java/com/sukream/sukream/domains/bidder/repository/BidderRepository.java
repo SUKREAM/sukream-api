@@ -11,6 +11,8 @@ import java.util.List;
 public interface BidderRepository extends JpaRepository<Bidder, Long> {
     List<Bidder> findByProduct_ProductIdOrderByPriceDesc(Long productId);
 
+
     List<Bidder> findAllByUser(User user);
+
 
 }
