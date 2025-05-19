@@ -3,6 +3,7 @@ package com.sukream.sukream.domains.bidder.service;
 import com.sukream.sukream.domains.bidder.dto.response.BidderResponse;
 import com.sukream.sukream.domains.bidder.entity.Bidder;
 import com.sukream.sukream.domains.bidder.repository.BidderRepository;
+import com.sukream.sukream.domains.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class BidderService {
 
     private final BidderRepository bidderRepository;
+    private final ProductRepository productRepository;
 
     public List<BidderResponse> getBiddersByProductId(Long productId) {
         List<Bidder> bidders = bidderRepository.findByProduct_ProductIdOrderByPriceDesc(productId);
@@ -52,4 +54,12 @@ public class BidderService {
             return (seconds / 86400) + "일 전";
         }
     }
+
+    // 본인 상품인지 확인
+    public boolean isProductOwner(Long productId, String userEmail) {
+        return productRepository.findById(productId)
+                .map(product -> product.getOwner().getEmail().equals(userEmail))
+                .orElse(false);
+    }
 }
+
