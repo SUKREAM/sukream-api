@@ -3,10 +3,13 @@ package com.sukream.sukream.domains.mypage.service;
 import com.sukream.sukream.domains.bidder.entity.Bidder;
 import com.sukream.sukream.domains.bidder.repository.BidderRepository;
 import com.sukream.sukream.domains.mypage.domain.dto.OrderResponseDto;
+import com.sukream.sukream.domains.user.domain.dto.UserPrincipal;
 import com.sukream.sukream.domains.user.domain.entity.Users;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +27,9 @@ public class MyOrderQueryService {
 
             String status = bidder.getIsAwarded() ? "낙찰완료" : "낙찰대기";
 
-            var orderDate = bidder.getCreatedAt();
+            LocalDateTime orderDate = bidder.getIsAwarded() && bidder.getAwardedAt() != null
+                    ?bidder.getAwardedAt() //낙찰시간
+                    :bidder.getBidAt(); //입찰시간
 
             OrderResponseDto dto = OrderResponseDto.builder()
                     .orderId(bidder.getId())
