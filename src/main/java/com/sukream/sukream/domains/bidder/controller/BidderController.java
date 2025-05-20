@@ -1,6 +1,9 @@
 package com.sukream.sukream.domains.bidder.controller;
 
+import com.sukream.sukream.domains.bidder.dto.request.BidRequest;
+import com.sukream.sukream.domains.bidder.dto.response.AwardBidderResponse;
 import com.sukream.sukream.domains.bidder.dto.response.BidderResponse;
+import com.sukream.sukream.domains.bidder.entity.Bidder;
 import com.sukream.sukream.domains.bidder.service.BidderService;
 import com.sukream.sukream.domains.user.domain.dto.UserPrincipal;
 import lombok.RequiredArgsConstructor;
@@ -32,4 +35,17 @@ public class BidderController {
         List<BidderResponse> bidders = bidderService.getBiddersByProductId(productId);
         return ResponseEntity.ok(bidders);
     }
+
+    @PostMapping
+    public ResponseEntity<BidderResponse> placeBid(@PathVariable Long productId,
+                                                   @RequestBody BidRequest bidRequest,
+                                                   @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String userEmail = userPrincipal.getUsername();
+
+        Bidder savedBid = bidderService.placeBid(productId, bidRequest, userEmail);
+        BidderResponse response = bidderService.toBidderResponse(savedBid);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
 }

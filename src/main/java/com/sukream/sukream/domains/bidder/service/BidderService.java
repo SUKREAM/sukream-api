@@ -1,9 +1,14 @@
 package com.sukream.sukream.domains.bidder.service;
 
+import com.sukream.sukream.domains.auth.repository.UserInfoRepository;
+import com.sukream.sukream.domains.bidder.dto.request.BidRequest;
+import com.sukream.sukream.domains.bidder.dto.response.AwardBidderResponse;
 import com.sukream.sukream.domains.bidder.dto.response.BidderResponse;
 import com.sukream.sukream.domains.bidder.entity.Bidder;
 import com.sukream.sukream.domains.bidder.repository.BidderRepository;
+import com.sukream.sukream.domains.product.entity.Product;
 import com.sukream.sukream.domains.product.repository.ProductRepository;
+import com.sukream.sukream.domains.user.domain.entity.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +23,7 @@ public class BidderService {
 
     private final BidderRepository bidderRepository;
     private final ProductRepository productRepository;
+    private final UserInfoRepository userInfoRepository;
 
     public List<BidderResponse> getBiddersByProductId(Long productId) {
         List<Bidder> bidders = bidderRepository.findByProduct_ProductIdOrderByPriceDesc(productId);
@@ -27,7 +33,7 @@ public class BidderService {
                 .collect(Collectors.toList());
     }
 
-    private BidderResponse toBidderResponse(Bidder bidder) {
+    public BidderResponse toBidderResponse(Bidder bidder) {
         String submittedAgo = calculateTimeAgo(bidder.getBidAt());
         return BidderResponse.builder()
                 .bidderId(bidder.getId())
@@ -61,5 +67,29 @@ public class BidderService {
                 .map(product -> product.getOwner().getEmail().equals(userEmail))
                 .orElse(false);
     }
+
+    public Bidder placeBid(Long productId, BidRequest bidRequest, String userEmail) {
+        // 상품 확인
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다."));
+
+        // 사용자 확인
+        Users user = userInfoRepository.findUsersByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+
+        // 입찰 생성
+        Bidder bidder = Bidder.builder()
+                .product(product)
+                .user(user)
+                .price(bidRequest.getPrice())
+                .nickname(bidRequest.getNickname())
+                .status(null)
+                .isAwarded(null)
+                .bidAt(null)
+                .build();
+
+        return bidderRepository.save(bidder);
+    }
+
 }
 
