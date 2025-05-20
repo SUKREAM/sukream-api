@@ -1,10 +1,12 @@
 package com.sukream.sukream.domains.product.service;
 
+import com.sukream.sukream.domains.auth.repository.UserInfoRepository;
 import com.sukream.sukream.domains.product.dto.AddProductRequest;
 import com.sukream.sukream.domains.product.dto.ProductResponse;
 import com.sukream.sukream.domains.product.dto.UpdateProductRequest;
 import com.sukream.sukream.domains.product.entity.Product;
 import com.sukream.sukream.domains.product.repository.ProductRepository;
+import com.sukream.sukream.domains.user.domain.entity.Users;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,13 +21,17 @@ import java.util.UUID;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final UserInfoRepository userInfoRepository;
 
     // 상품 등록
     @Transactional
     public Long createProduct(AddProductRequest requestDto) {
+        Users seller = userInfoRepository.findById(requestDto.getSellerId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 판매자를 찾을 수 없습니다."));
+
+
         Product product = Product.builder()
-                // TODO : sellerId
-//                .sellerId(requestDto.getSellerId())
+                .owner(seller)
                 .title(requestDto.getTitle())
                 .description(requestDto.getDescription())
                 .minPrice(requestDto.getMinPrice())
@@ -34,7 +40,7 @@ public class ProductService {
                 .bidUnit(requestDto.getBidUnit())
                 .deadline(requestDto.getDeadline())
                 .status("거래 중")
-                .bidAccount(0)
+                .bidCount(0)
                 .auctionNum(generateAuctionNum())
                 .image(requestDto.getImage())
                 .chatLink(requestDto.getChatLink())

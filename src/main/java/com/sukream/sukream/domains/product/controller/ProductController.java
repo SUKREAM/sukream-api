@@ -39,7 +39,7 @@ public class ProductController {
     }
 
     // 상품 수정
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Void> updateProduct(@PathVariable Long id,
                                               @RequestBody UpdateProductRequest requestDto) {
         productService.updateProduct(id, requestDto);

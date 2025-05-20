@@ -47,8 +47,8 @@ public class Product extends BaseTimeEntity {
     @Column(name = "auction_num", nullable = false)
     private String auctionNum;
 
-    @Column(name = "bid_account", nullable = false)
-    private int bidAccount;
+    @Column(name = "bid_count", nullable = false)
+    private int bidCount;
 
     @Column(name = "bid_unit", nullable = false)
     private int bidUnit;
