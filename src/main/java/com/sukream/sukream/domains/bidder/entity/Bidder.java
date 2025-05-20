@@ -70,7 +70,7 @@ public class Bidder extends BaseTimeEntity {
         if (this.status == null) {
             this.status = BidderStatus.PENDING;
         }
-    }ㅔ
+    }
 
     // 낙찰 처리
     public void award() {
