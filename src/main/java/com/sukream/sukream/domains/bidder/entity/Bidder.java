@@ -6,6 +6,8 @@ import com.sukream.sukream.domains.user.domain.entity.Users;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -40,25 +42,33 @@ public class Bidder extends BaseTimeEntity {
     @Column(nullable = false)
     private String nickname;
 
+    @Column(name = "bid_at", nullable = false)
+    private LocalDateTime bidAt; // 입찰 시간
+
+    @Column(name = "awarded_at")
+    private LocalDateTime awardedAt; // 낙찰 시간
+
     @Builder
-    public Bidder(Users user, Integer price, Boolean isAwarded, BidderStatus status, Product product, String nickname) {
+    public Bidder(Users user, Integer price, Boolean isAwarded, BidderStatus status, Product product, String nickname, LocalDateTime bidAt) {
         this.user = user;
         this.price = price;
         this.isAwarded = isAwarded == null ? false : isAwarded;
         this.status = status == null ? BidderStatus.PENDING : status;
         this.product = product;
         this.nickname = nickname;
-        this.user = user;
+        this.bidAt = bidAt == null ? LocalDateTime.now() : bidAt; // 기본값으로 현재 시각
     }
 
     // 낙찰 처리
     public void award() {
         this.isAwarded = true;
         this.status = BidderStatus.AWARDED;
+        this.awardedAt = LocalDateTime.now();
     }
 
     // 상태 초기화
     public void pending() {
         this.isAwarded = false;
         this.status = BidderStatus.PENDING;
-    }}
+    }
+}
