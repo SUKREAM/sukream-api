@@ -24,7 +24,7 @@ public class ProductResponse {
     private String chatLink;
     private String status;
     private String auctionNum;
-    private int bidAccount;
+    private int bidCount;
 
     public static ProductResponse fromEntity(Product product) {
         return ProductResponse.builder()
@@ -43,7 +43,7 @@ public class ProductResponse {
                 .chatLink(product.getChatLink())
                 .status(product.getStatus())
                 .auctionNum(product.getAuctionNum())
-                .bidAccount(product.getBidAccount())
+                .bidCount(product.getBidCount())
                 .build();
     }
 }

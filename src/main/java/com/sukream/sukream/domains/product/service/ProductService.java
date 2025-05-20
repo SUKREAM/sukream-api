@@ -34,7 +34,7 @@ public class ProductService {
                 .bidUnit(requestDto.getBidUnit())
                 .deadline(requestDto.getDeadline())
                 .status("거래 중")
-                .bidAccount(0)
+                .bidCount(0)
                 .auctionNum(generateAuctionNum())
                 .image(requestDto.getImage())
                 .chatLink(requestDto.getChatLink())
