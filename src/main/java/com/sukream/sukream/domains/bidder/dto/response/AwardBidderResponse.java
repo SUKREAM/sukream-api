@@ -2,6 +2,8 @@ package com.sukream.sukream.domains.bidder.dto.response;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,5 +21,6 @@ public class AwardBidderResponse {
         private String nickname;
         private Integer price;
         private Long productId;
+        private LocalDateTime awardedAt;
     }
 }

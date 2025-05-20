@@ -28,7 +28,7 @@ public class BidderService {
     }
 
     private BidderResponse toBidderResponse(Bidder bidder) {
-        String submittedAgo = calculateTimeAgo(bidder.getCreatedAt());
+        String submittedAgo = calculateTimeAgo(bidder.getBidAt());
         return BidderResponse.builder()
                 .bidderId(bidder.getId())
                 .nickname(bidder.getNickname())
