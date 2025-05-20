@@ -59,6 +59,19 @@ public class Bidder extends BaseTimeEntity {
         this.bidAt = bidAt == null ? LocalDateTime.now() : bidAt; // 기본값으로 현재 시각
     }
 
+    @PrePersist
+    public void prePersist() {
+        if (this.bidAt == null) {
+            this.bidAt = LocalDateTime.now();
+        }
+        if (this.isAwarded == null) {
+            this.isAwarded = false;
+        }
+        if (this.status == null) {
+            this.status = BidderStatus.PENDING;
+        }
+    }ㅔ
+
     // 낙찰 처리
     public void award() {
         this.isAwarded = true;
