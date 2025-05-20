@@ -53,6 +53,9 @@ public class SecurityConfig {
                                 .requestMatchers("/api/products/*/bidders").authenticated()
                                 .requestMatchers("/api/bidders/*/award").authenticated()
 
+                                .requestMatchers("/api/mypage/orders").authenticated()
+
+
                                 // 그 외는 모두 허용
                                 .anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
