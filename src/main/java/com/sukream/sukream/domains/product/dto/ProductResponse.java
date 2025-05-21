@@ -1,6 +1,7 @@
 package com.sukream.sukream.domains.product.dto;
 
 import com.sukream.sukream.domains.product.entity.Product;
+import com.sukream.sukream.domains.product.entity.ProductStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -22,7 +23,7 @@ public class ProductResponse {
     private LocalDateTime deadline;
     private String image;
     private String chatLink;
-    private String status;
+    private ProductStatus status;
     private String auctionNum;
     private int bidCount;
 
@@ -41,7 +42,7 @@ public class ProductResponse {
                 .deadline(product.getDeadline())
                 .image(product.getImage())
                 .chatLink(product.getChatLink())
-                .status(product.getStatus().getDescription())
+                .status(product.getStatus())
                 .auctionNum(product.getAuctionNum())
                 .bidCount(product.getBidCount())
                 .build();

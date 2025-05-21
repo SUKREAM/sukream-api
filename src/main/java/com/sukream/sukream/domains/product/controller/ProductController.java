@@ -97,7 +97,7 @@ public class ProductController {
             productService.validateProductOwner(id, userPrincipal.getUser().getId());
 
             productService.deleteProduct(id);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok(DataResponse.success(null, SuccessCode.PRODUCT_DELETE_SUCCESS));
         } catch (EntityNotFoundException e) {
             return Response.toErrorResponseEntity(ErrorCode.RESOURCE_NOT_FOUND.getValue(), ErrorCode.RESOURCE_NOT_FOUND.getDescription());
         } catch (Exception e) {

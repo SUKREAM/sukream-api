@@ -40,7 +40,7 @@ public class ProductService {
                 .category(requestDto.getCategory())
                 .bidUnit(requestDto.getBidUnit())
                 .deadline(requestDto.getDeadline())
-                .status(ProductStatus.IN_PROGRESS) // 등록할 땐 진행 중으로
+                .status(ProductStatus.OPEN)
                 .bidCount(0)
                 .auctionNum(generateAuctionNum())
                 .image(requestDto.getImage())
@@ -94,6 +94,7 @@ public class ProductService {
             throw new IllegalArgumentException("해당 상품에 대한 권한이 없습니다.");
         }
     }
+
 
     private String generateAuctionNum() {
         return UUID.randomUUID().toString();

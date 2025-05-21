@@ -42,3 +42,6 @@ application.yml
 # 빌드 설정 파일
 build.gradle
 
+/generated/
+
+
