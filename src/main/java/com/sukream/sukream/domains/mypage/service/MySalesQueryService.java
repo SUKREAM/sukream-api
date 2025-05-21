@@ -5,7 +5,6 @@ import com.sukream.sukream.domains.product.entity.Product;
 import com.sukream.sukream.domains.product.repository.ProductRepository;
 import com.sukream.sukream.domains.user.domain.entity.Users;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,6 +25,7 @@ public class MySalesQueryService {
                     .productName(product.getTitle())
                     .productImage(product.getImage())
                     .status(product.getStatus())
+                    .createdAt(product.getCreatedAt())
                     .build();
 
             result.add(dto);
