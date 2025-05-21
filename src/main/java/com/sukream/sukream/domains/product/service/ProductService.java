@@ -84,6 +84,17 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
+    // 소유자 검증 메서드 추가 (수정된 부분)
+    @Transactional(readOnly = true)
+    public void validateProductOwner(Long productId, Long userId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다."));
+
+        if (!product.getOwner().getId().equals(userId)) {
+            throw new IllegalArgumentException("해당 상품에 대한 권한이 없습니다.");
+        }
+    }
+
     private String generateAuctionNum() {
         return UUID.randomUUID().toString();
     }

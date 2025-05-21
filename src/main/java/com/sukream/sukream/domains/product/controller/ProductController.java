@@ -8,17 +8,19 @@ import com.sukream.sukream.domains.product.dto.AddProductRequest;
 import com.sukream.sukream.domains.product.dto.ProductResponse;
 import com.sukream.sukream.domains.product.dto.UpdateProductRequest;
 import com.sukream.sukream.domains.product.service.ProductService;
+import com.sukream.sukream.domains.user.domain.dto.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/products")
+@RequestMapping("/api/product")
 public class ProductController {
 
     private final ProductService productService;
@@ -26,8 +28,10 @@ public class ProductController {
     // 상품 등록
     @Operation(summary = "상품 등록", description = "경매 상품을 등록한다.")
     @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody AddProductRequest requestDto) {
+    public ResponseEntity<?> createProduct(@RequestBody AddProductRequest requestDto, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         try {
+            requestDto.setSellerId(userPrincipal.getUser().getId());  // 로그인한 유저 ID로 강제 설정
+
             Long productId = productService.createProduct(requestDto);
             return ResponseEntity.ok(DataResponse.success(productId, SuccessCode.PRODUCT_CREATE_SUCCESS));
         } catch (IllegalArgumentException e) {
@@ -67,8 +71,12 @@ public class ProductController {
     @Operation(summary = "상품 수정", description = "title, description, minPrice, maxPrice, category, bidUnit, deadline, image, chatLink를 수정한다.")
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id,
-                                           @RequestBody UpdateProductRequest requestDto) {
+                                           @RequestBody UpdateProductRequest requestDto,
+                                            @AuthenticationPrincipal UserPrincipal userPrincipal) {
         try {
+            // 로그인한 사용자가 해당 상품의 소유자인지 검증
+            productService.validateProductOwner(id, userPrincipal.getUser().getId());
+
             productService.updateProduct(id, requestDto);
             return ResponseEntity.ok(DataResponse.success(null, SuccessCode.PRODUCT_UPDATE_SUCCESS));
         } catch (EntityNotFoundException e) {
@@ -83,8 +91,11 @@ public class ProductController {
     // 상품 삭제
     @Operation(summary = "상품 삭제", description = "상품을 삭제한다.")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id, @AuthenticationPrincipal UserPrincipal userPrincipal)  {
         try {
+            // 로그인한 사용자가 해당 상품의 소유자인지 검증
+            productService.validateProductOwner(id, userPrincipal.getUser().getId());
+
             productService.deleteProduct(id);
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {
