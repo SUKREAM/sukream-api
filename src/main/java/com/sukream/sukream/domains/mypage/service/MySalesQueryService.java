@@ -25,7 +25,7 @@ public class MySalesQueryService {
                     .productId(product.getProductId())
                     .productName(product.getTitle())
                     .productImage(product.getImage())
-                    .status(product.getStatus())
+                    .status(product.getStatus().getDescription())
                     .build();
 
             result.add(dto);

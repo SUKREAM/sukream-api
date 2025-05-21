@@ -41,7 +41,7 @@ public class ProductResponse {
                 .deadline(product.getDeadline())
                 .image(product.getImage())
                 .chatLink(product.getChatLink())
-                .status(product.getStatus())
+                .status(product.getStatus().getDescription())
                 .auctionNum(product.getAuctionNum())
                 .bidCount(product.getBidCount())
                 .build();

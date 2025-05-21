@@ -5,6 +5,7 @@ import com.sukream.sukream.domains.product.dto.AddProductRequest;
 import com.sukream.sukream.domains.product.dto.ProductResponse;
 import com.sukream.sukream.domains.product.dto.UpdateProductRequest;
 import com.sukream.sukream.domains.product.entity.Product;
+import com.sukream.sukream.domains.product.entity.ProductStatus;
 import com.sukream.sukream.domains.product.repository.ProductRepository;
 import com.sukream.sukream.domains.user.domain.entity.Users;
 import jakarta.persistence.EntityNotFoundException;
@@ -39,7 +40,7 @@ public class ProductService {
                 .category(requestDto.getCategory())
                 .bidUnit(requestDto.getBidUnit())
                 .deadline(requestDto.getDeadline())
-                .status("거래 중")
+                .status(ProductStatus.IN_PROGRESS) // 등록할 땐 진행 중으로
                 .bidCount(0)
                 .auctionNum(generateAuctionNum())
                 .image(requestDto.getImage())

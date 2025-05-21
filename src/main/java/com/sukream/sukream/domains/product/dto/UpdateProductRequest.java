@@ -21,4 +21,5 @@ public class UpdateProductRequest {
     private LocalDateTime deadline;
     private String image;
     private String chatLink;
+    private String status;
 }
