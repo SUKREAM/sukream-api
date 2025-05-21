@@ -75,6 +75,7 @@ public class Product extends BaseTimeEntity {
         this.deadline = requestDto.getDeadline();
         this.image = requestDto.getImage();
         this.chatLink = requestDto.getChatLink();
+        this.status = ProductStatus.valueOf(requestDto.getStatus().toUpperCase());
     }
 
     public LocalDateTime getBidDeadline() {
