@@ -38,8 +38,9 @@ public class Product extends BaseTimeEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private ProductStatus status;
 
     @Column(name = "deadline", nullable = false)
     private LocalDateTime deadline;
@@ -76,5 +77,25 @@ public class Product extends BaseTimeEntity {
         this.chatLink = requestDto.getChatLink();
     }
 
+    public LocalDateTime getBidDeadline() {
+        return this.deadline;
+    }
+
+    // 현재 시간이 상품의 입찰 마감 시각 지났는지 여부 판단
+    public boolean isBidDeadlinePassed() {
+        return LocalDateTime.now().isAfter(this.deadline);
+    }
+
+    // 입찰 들어올 때 입찰 수 1 증가
+    public void increaseBidCount() {
+        this.bidCount++;
+    }
+
+    // 입찰 취소 or 삭제된 경우 입찰 수 감소
+    public void decreaseBidCount() {
+        if (this.bidCount > 0) {
+            this.bidCount--;
+        }
+    }
 
 }
