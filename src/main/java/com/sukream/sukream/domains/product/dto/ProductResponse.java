@@ -23,7 +23,7 @@ public class ProductResponse {
     private LocalDateTime deadline;
     private String image;
     private String chatLink;
-    private ProductStatus status;
+    private String status;
     private String auctionNum;
     private int bidCount;
 
@@ -42,7 +42,7 @@ public class ProductResponse {
                 .deadline(product.getDeadline())
                 .image(product.getImage())
                 .chatLink(product.getChatLink())
-                .status(product.getStatus())
+                .status(product.getStatus().getDescription())
                 .auctionNum(product.getAuctionNum())
                 .bidCount(product.getBidCount())
                 .build();
