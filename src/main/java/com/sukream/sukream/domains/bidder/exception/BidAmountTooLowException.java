@@ -7,8 +7,4 @@ public class BidAmountTooLowException extends BaseErrorException {
     public BidAmountTooLowException() {
         super(ErrorCode.BID_AMOUNT_TOO_LOW);
     }
-
-    public BidAmountTooLowException(String message) {
-        super(ErrorCode.BID_AMOUNT_TOO_LOW, message);
-    }
 }
