@@ -115,6 +115,7 @@ public class BidderService {
                 .status(BidderStatus.PENDING)
                 .isAwarded(false)
                 .bidAt(LocalDateTime.now())
+                .nickname(bidRequest.getNickname())
                 .build();
 
         return bidderRepository.save(bidder);
