@@ -51,7 +51,7 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final NumberPath<Long> productId = createNumber("productId", Long.class);
 
-    public final StringPath status = createString("status");
+    public final EnumPath<ProductStatus> status = createEnum("status", ProductStatus.class);
 
     public final StringPath title = createString("title");
 
