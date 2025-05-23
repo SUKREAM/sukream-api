@@ -54,6 +54,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/bidders/*/award").authenticated()
 
                                 .requestMatchers("/api/mypage/orders").authenticated()
+                                .requestMatchers("/reviews").authenticated()
 
 
                                 // 그 외는 모두 허용
