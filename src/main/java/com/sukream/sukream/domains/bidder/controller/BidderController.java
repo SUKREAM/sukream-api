@@ -75,4 +75,26 @@ public class BidderController {
             return Response.toErrorResponseEntity(ErrorCode.ERR_UNKNOWN.getValue(), ErrorCode.ERR_UNKNOWN.getDescription());
         }
     }
+
+    @Operation(summary = "낙찰자 지정", description = "판매자가 특정 입찰자를 낙찰자로 지정한다.")
+    @PostMapping("/award/{bidderId}")
+    public ResponseEntity<?> awardBidder(@PathVariable Long productId,
+                                         @PathVariable Long bidderId,
+                                         @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        try {
+            String userEmail = userPrincipal.getUsername();
+            Bidder awardedBidder = bidderService.awardBidder(productId, bidderId, userEmail);
+            return ResponseEntity.ok(DataResponse.success(bidderService.toAwardedResponse(awardedBidder),
+                    SuccessCode.BIDDER_AWARD_SUCCESS));
+        } catch (BidderNotFoundException e) {
+            return Response.toErrorResponseEntity(ErrorCode.BIDDER_NOT_FOUND);
+        } catch (BidderNotBelongToProductException e) {
+            return Response.toErrorResponseEntity(ErrorCode.BIDDER_NOT_BELONG_TO_PRODUCT);
+        } catch (UnauthorizedAwardAccessException e) {
+            return Response.toErrorResponseEntity(ErrorCode.FORBIDDEN);
+        } catch (Exception e) {
+            return Response.toErrorResponseEntity(ErrorCode.ERR_UNKNOWN.getValue(), ErrorCode.ERR_UNKNOWN.getDescription());
+        }
+    }
+
 }
