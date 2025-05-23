@@ -2,6 +2,7 @@ package com.sukream.sukream.domains.bidder.service;
 
 import com.sukream.sukream.domains.auth.repository.UserInfoRepository;
 import com.sukream.sukream.domains.bidder.dto.request.BidRequest;
+import com.sukream.sukream.domains.bidder.dto.response.AwardedBidderResponse;
 import com.sukream.sukream.domains.bidder.dto.response.BidderResponse;
 import com.sukream.sukream.domains.bidder.entity.Bidder;
 import com.sukream.sukream.domains.bidder.entity.BidderStatus;
@@ -119,6 +120,36 @@ public class BidderService {
                 .build();
 
         return bidderRepository.save(bidder);
+    }
+
+    @Transactional
+    public Bidder awardBidder(Long productId, Long bidderId, String userEmail) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(BidInvalidProductException::new);
+
+        if (!product.getOwner().getEmail().equals(userEmail)) {
+            throw new UnauthorizedAwardAccessException();
+        }
+
+        Bidder bidder = bidderRepository.findById(bidderId)
+                .orElseThrow(BidderNotFoundException::new);
+
+        if (!bidder.getProduct().getProductId().equals(productId)) {
+            throw new BidderNotBelongToProductException();
+        }
+
+        bidder.award();
+        return bidder;
+    }
+
+    public AwardedBidderResponse toAwardedResponse(Bidder bidder) {
+        return AwardedBidderResponse.builder()
+                .bidderId(bidder.getId())
+                .nickname(bidder.getNickname())
+                .price(bidder.getPrice())
+                .productId(bidder.getProduct().getProductId())
+                .awardedAt(bidder.getAwardedAt())
+                .build();
     }
 
 }

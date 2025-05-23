@@ -7,8 +7,4 @@ public class UserNotFoundException extends BaseErrorException {
     public UserNotFoundException() {
         super(ErrorCode.BID_AMOUNT_TOO_LOW);
     }
-
-    public UserNotFoundException(String message) {
-        super(ErrorCode.BID_AMOUNT_TOO_LOW, message);
-    }
 }
