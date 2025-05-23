@@ -23,6 +23,10 @@ public enum ErrorCode {
     BID_DEADLINE_EXCEEDED(400, "입찰 마감 시간이 지나 입찰할 수 없습니다."),
     USER_NO_FOUND(404, "사용자가 존재하지 않습니다."),
 
+    // 낙찰 관련 에러
+    BIDDER_NOT_FOUND(404, "요청한 입찰자를 찾을 수 없습니다."),
+    BIDDER_NOT_BELONG_TO_PRODUCT(400, "해당 입찰자는 이 상품의 입찰자가 아닙니다."),
+
     // 인증/인가 관련
     AUTHENTICATION_REQUIRED(401, "로그인이 필요합니다."),
     USER_NOT_FOUND(404, "사용자 정보를 찾을 수 없습니다.");
