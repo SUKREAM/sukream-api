@@ -2,6 +2,7 @@ package com.sukream.sukream.domains.auth.controller;
 
 import com.sukream.sukream.commons.domain.response.Response;
 import com.sukream.sukream.domains.auth.domain.request.LoginRequest;
+import com.sukream.sukream.domains.auth.domain.request.SignInRequest;
 import com.sukream.sukream.domains.auth.domain.response.TokenResponse;
 import com.sukream.sukream.domains.auth.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +34,17 @@ public class AuthController {
     @PostMapping("/login")
     public TokenResponse doLogin(HttpServletResponse response, LoginRequest loginRequest) {
         return authService.login(response, loginRequest);
+    }
+
+    /**
+     * 회원가입 Controller
+     */
+    @Operation(summary = "회원가입", description = """
+             아이디, 비밀번호로 회원가입 한다.
+            """)
+    @PostMapping("/signin")
+    public TokenResponse doSignIn(HttpServletResponse response, SignInRequest signInRequest) {
+        return authService.signIn(response, signInRequest);
     }
 
     /**
