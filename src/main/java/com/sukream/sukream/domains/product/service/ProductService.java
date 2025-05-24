@@ -47,7 +47,7 @@ public class ProductService {
                 .chatLink(requestDto.getChatLink())
                 .build();
 
-        return productRepository.save(product).getProductId();
+        return productRepository.save(product).getId();
     }
 
     // 상품 조회

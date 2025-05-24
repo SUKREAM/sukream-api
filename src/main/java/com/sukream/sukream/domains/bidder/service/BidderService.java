@@ -29,7 +29,7 @@ public class BidderService {
     private final UserInfoRepository userInfoRepository;
 
     public List<BidderResponse> getBiddersByProductId(Long productId) {
-        List<Bidder> bidders = bidderRepository.findByProduct_ProductIdOrderByPriceDesc(productId);
+        List<Bidder> bidders = bidderRepository.findByProduct_IdOrderByPriceDesc(productId);
 
         return bidders.stream()
                 .map(this::toBidderResponse)
@@ -134,7 +134,7 @@ public class BidderService {
         Bidder bidder = bidderRepository.findById(bidderId)
                 .orElseThrow(BidderNotFoundException::new);
 
-        if (!bidder.getProduct().getProductId().equals(productId)) {
+        if (!bidder.getProduct().getId().equals(productId)) {
             throw new BidderNotBelongToProductException();
         }
 
@@ -147,7 +147,7 @@ public class BidderService {
                 .bidderId(bidder.getId())
                 .nickname(bidder.getNickname())
                 .price(bidder.getPrice())
-                .productId(bidder.getProduct().getProductId())
+                .productId(bidder.getProduct().getId())
                 .awardedAt(bidder.getAwardedAt())
                 .build();
     }

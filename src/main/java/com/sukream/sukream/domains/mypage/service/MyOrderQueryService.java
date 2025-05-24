@@ -33,7 +33,7 @@ public class MyOrderQueryService {
 
             OrderResponseDto dto = OrderResponseDto.builder()
                     .orderId(bidder.getId())
-                    .productId(product.getProductId())
+                    .productId(product.getId())
                     .productName(product.getTitle())
                     .productImage(product.getImage())
                     .orderDate(orderDate)

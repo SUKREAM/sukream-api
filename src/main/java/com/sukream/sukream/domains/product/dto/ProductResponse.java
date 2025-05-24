@@ -29,7 +29,7 @@ public class ProductResponse {
 
     public static ProductResponse fromEntity(Product product) {
         return ProductResponse.builder()
-                .productId(product.getProductId())
+                .productId(product.getId())
                 .sellerId(product.getOwner().getId())
                 .title(product.getTitle())
                 .description(product.getDescription())
