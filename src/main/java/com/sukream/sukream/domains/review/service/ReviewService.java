@@ -4,12 +4,19 @@ import com.sukream.sukream.domains.bidder.repository.BidderRepository;
 import com.sukream.sukream.domains.product.entity.Product;
 import com.sukream.sukream.domains.product.repository.ProductRepository;
 import com.sukream.sukream.domains.review.domain.dto.CreateReviewRequest;
+import com.sukream.sukream.domains.review.domain.dto.ReceivedReviewResponse;
+import com.sukream.sukream.domains.review.domain.dto.ReceivedReviewSummaryResponse;
 import com.sukream.sukream.domains.review.domain.entity.Review;
 import com.sukream.sukream.domains.review.repository.ReviewRepository;
+
 import com.sukream.sukream.domains.user.domain.entity.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,5 +52,41 @@ public class ReviewService {
                 .build();
 
         reviewRepository.save(review);
+    }
+
+    //4. 리뷰 조회
+    public ReceivedReviewSummaryResponse getReceivedReviews(Long sellerId){
+        List<Review> reviews = reviewRepository.findByProduct_Owner_Id(sellerId);
+
+        if(reviews.isEmpty()) {
+            return ReceivedReviewSummaryResponse.builder()
+                    .userName("")
+                    .averageRating(0)
+                    .reviews(Collections.emptyList())
+                    .build();
+        }
+
+        String userName = reviews.get(0).getProduct().getOwner().getName();
+
+        double averageRating = reviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0);
+
+        List<ReceivedReviewResponse> reviewResponses = reviews.stream()
+                .map(review -> ReceivedReviewResponse.builder()
+                        .productId(review.getProduct().getId())
+                        .productName(review.getProduct().getTitle())
+                        .rating(review.getRating())
+                        .content(review.getContent())
+                        .qualityAssesment(review.getQualityAssessment())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ReceivedReviewSummaryResponse.builder()
+                .userName(userName)
+                .averageRating(averageRating)
+                .reviews(reviewResponses)
+                .build();
     }
 }
