@@ -1,14 +1,14 @@
 package com.sukream.sukream.domains.product.repository;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sukream.sukream.domains.product.entity.Product;
-import com.sukream.sukream.domains.product.entity.QProduct;
 import com.sukream.sukream.domains.product.dto.ProductResponse;
+import com.sukream.sukream.domains.product.entity.QProduct;
+import com.sukream.sukream.domains.bidder.entity.QBidder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -18,24 +18,55 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
     @Override
     public List<ProductResponse> findByCategoryAndSort(String category, String sort) {
-        QProduct product = QProduct.product;
+        return findProductsWithBidCountAndSort(category, sort);
+    }
 
-        var query = queryFactory.selectFrom(product);
+    private List<ProductResponse> findProductsWithBidCountAndSort(String category, String sort) {
+        QProduct product = QProduct.product;
+        QBidder bidder = QBidder.bidder;
+
+        var bidCountExpr = bidder.count();
+
+        var query = queryFactory.select(product, bidCountExpr)
+                .from(product)
+                .leftJoin(bidder).on(bidder.product.id.eq(product.id));
 
         if (category != null && !category.isEmpty()) {
             query.where(product.category.eq(category));
         }
 
-        if ("latest".equalsIgnoreCase(sort)) {
+        query.groupBy(
+                product.id,
+                product.auctionNum,
+                product.bidUnit,
+                product.category,
+                product.chatLink,
+                product.createdAt,
+                product.deadline,
+                product.description,
+                product.image,
+                product.maxPrice,
+                product.minPrice,
+                product.owner.id,
+                product.status,
+                product.title,
+                product.updatedAt
+        );
+
+        if ("popular".equalsIgnoreCase(sort)) {
+            query.orderBy(bidCountExpr.desc(), product.createdAt.desc());
+        } else {
             query.orderBy(product.createdAt.desc());
-        } else if ("popular".equalsIgnoreCase(sort)) {
-            query.orderBy(product.bidCount.desc());
         }
 
-        List<Product> products = query.fetch();
+        List<Tuple> result = query.fetch();
 
-        return products.stream()
-                .map(ProductResponse::fromEntity)
-                .collect(Collectors.toList());
+        return result.stream()
+                .map(tuple -> {
+                    Long bidCountObj = tuple.get(bidCountExpr);
+                    int bidCount = bidCountObj == null ? 0 : bidCountObj.intValue();
+                    return ProductResponse.fromEntityAndBidCount(tuple.get(product), bidCount);
+                })
+                .toList();
     }
 }

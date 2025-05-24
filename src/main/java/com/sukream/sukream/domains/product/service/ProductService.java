@@ -1,12 +1,13 @@
 package com.sukream.sukream.domains.product.service;
 
 import com.sukream.sukream.domains.auth.repository.UserInfoRepository;
+import com.sukream.sukream.domains.bidder.repository.BidderRepository;
+import com.sukream.sukream.domains.product.repository.ProductRepository;
 import com.sukream.sukream.domains.product.dto.AddProductRequest;
 import com.sukream.sukream.domains.product.dto.ProductResponse;
 import com.sukream.sukream.domains.product.dto.UpdateProductRequest;
 import com.sukream.sukream.domains.product.entity.Product;
 import com.sukream.sukream.domains.product.entity.ProductStatus;
-import com.sukream.sukream.domains.product.repository.ProductRepository;
 import com.sukream.sukream.domains.user.domain.entity.Users;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final UserInfoRepository userInfoRepository;
+    private final BidderRepository bidderRepository;
 
     // 상품 등록
     @Transactional
@@ -39,7 +41,6 @@ public class ProductService {
                 .bidUnit(requestDto.getBidUnit())
                 .deadline(requestDto.getDeadline())
                 .status(ProductStatus.OPEN)
-                .bidCount(0)
                 .auctionNum(generateAuctionNum())
                 .image(requestDto.getImage())
                 .chatLink(requestDto.getChatLink())
@@ -48,22 +49,22 @@ public class ProductService {
         return productRepository.save(product).getId();
     }
 
-    // 상품 조회
+    // 상품 상세 조회 (입찰 수 실시간 집계 반영)
     @Transactional(readOnly = true)
     public ProductResponse getProduct(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다."));
-        return ProductResponse.fromEntity(product);
+
+        // 입찰 수 실시간 조회
+        int bidCount = bidderRepository.countByProduct_Id(id);
+
+        return ProductResponse.fromEntityAndBidCount(product, bidCount);
     }
 
-    // 카테고리 별 상품 목록 조회 및 정렬
+    // 카테고리 별 상품 목록 조회 및 정렬 (입찰 수 집계 반영)
     @Transactional(readOnly = true)
     public List<ProductResponse> getAllProducts(String category, String sort) {
-        try {
-            return productRepository.findByCategoryAndSort(category, sort);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("상품 목록 조회 중 오류가 발생했습니다.");
-        }
+        return productRepository.findByCategoryAndSort(category, sort);
     }
 
     // 상품 수정
@@ -84,7 +85,7 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    // 소유자 검증 메서드 추가 (수정된 부분)
+    // 소유자 검증 메서드
     @Transactional(readOnly = true)
     public void validateProductOwner(Long productId, Long userId) {
         Product product = productRepository.findById(productId)
@@ -95,9 +96,7 @@ public class ProductService {
         }
     }
 
-
     private String generateAuctionNum() {
         return UUID.randomUUID().toString();
     }
-
 }

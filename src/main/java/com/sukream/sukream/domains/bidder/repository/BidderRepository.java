@@ -26,4 +26,6 @@ public interface BidderRepository extends JpaRepository<Bidder, Long> {
     //특정 경매 - userid, productid, isAwarded 통해 검증
     boolean existsByUser_IdAndProduct_IdAndIsAwardedTrue(Long userId, Long productId);
 
+    // 입찰 수 계산
+    int countByProduct_Id(Long productId);
 }
