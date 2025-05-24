@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 // 인증 필요 없는 API - GET 요청 위주로 접근 허용
-                                .requestMatchers(HttpMethod.GET, "/api/product", "/api/product/*", "/api/products/*").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/product", "/api/product/*", "/api/products/*" ).permitAll()
 
                                 // 인증 필요 - 상품 등록(POST), 수정(PUT), 삭제(DELETE), 입찰 관련 등
                                 .requestMatchers(HttpMethod.POST, "/api/product").authenticated()
@@ -54,8 +54,8 @@ public class SecurityConfig {
                                 .requestMatchers("/api/bidders/*/award").authenticated()
 
                                 .requestMatchers("/api/mypage/orders").authenticated()
-                                .requestMatchers("/reviews").authenticated()
-
+                                .requestMatchers(HttpMethod.POST, "/reviews").authenticated()
+                                .requestMatchers(HttpMethod.GET, "/reviews/me/received").authenticated()
 
                                 // 그 외는 모두 허용
                                 .anyRequest().authenticated())
