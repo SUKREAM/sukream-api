@@ -29,7 +29,6 @@ public class ProductService {
         Users seller = userInfoRepository.findById(requestDto.getSellerId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 판매자를 찾을 수 없습니다."));
 
-
         Product product = Product.builder()
                 .owner(seller)
                 .title(requestDto.getTitle())
@@ -58,8 +57,13 @@ public class ProductService {
     }
 
     // 카테고리 별 상품 목록 조회 및 정렬
+    @Transactional(readOnly = true)
     public List<ProductResponse> getAllProducts(String category, String sort) {
-        return productRepository.findByCategoryAndSort(category, sort);
+        try {
+            return productRepository.findByCategoryAndSort(category, sort);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("상품 목록 조회 중 오류가 발생했습니다.");
+        }
     }
 
     // 상품 수정

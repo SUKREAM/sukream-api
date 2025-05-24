@@ -11,6 +11,7 @@ public enum ErrorCode {
     SUCCESS(200, "Success !!(200)"),
     DELETE_FAIL(501, "Delete Resource Failed(501)"),
     UPDATE_FAIL(502, "Update Resource Failed(502)"),
+    INVALID_INPUT_VALUE(400, "입력값이 올바르지 않습니다."),
     RESOURCE_NOT_FOUND(404, "Resource Not Found(404)"),
     FORBIDDEN(403, "접근 권한이 없습니다."),
 

@@ -36,7 +36,8 @@ public class ProductController {
             Long productId = productService.createProduct(requestDto);
             return ResponseEntity.ok(DataResponse.success(productId, SuccessCode.PRODUCT_CREATE_SUCCESS));
         } catch (IllegalArgumentException e) {
-            return Response.toErrorResponseEntity(ErrorCode.ERR_UNKNOWN.getValue(), e.getMessage());
+            // 입력값 오류 혹은 권한 문제로 분류 가능
+            return Response.toErrorResponseEntity(ErrorCode.INVALID_INPUT_VALUE.getValue(), e.getMessage());
         } catch (Exception e) {
             return Response.toErrorResponseEntity(ErrorCode.ERR_UNKNOWN.getValue(), ErrorCode.ERR_UNKNOWN.getDescription());
         }
@@ -59,11 +60,18 @@ public class ProductController {
     // 카테고리별 상품 전체 조회 및 정렬
     @Operation(summary = "상품 목록 조회", description = "상품을 인기순, 등록순 정렬하고 카테고리별 조회한다.")
     @GetMapping
-    public List<ProductResponse> getProductsByCategoryAndSort(
+    public ResponseEntity<?> getProductsByCategoryAndSort(
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "latest") String sort
     ) {
-        return productService.getAllProducts(category, sort);
+        try {
+            List<ProductResponse> products = productService.getAllProducts(category, sort);
+            return ResponseEntity.ok(DataResponse.success(products, SuccessCode.PRODUCT_READ_SUCCESS));
+        } catch (IllegalArgumentException e) {
+            return Response.toErrorResponseEntity(ErrorCode.INVALID_INPUT_VALUE.getValue(), e.getMessage());
+        } catch (Exception e) {
+            return Response.toErrorResponseEntity(ErrorCode.ERR_UNKNOWN.getValue(), ErrorCode.ERR_UNKNOWN.getDescription());
+        }
     }
 
     // 상품 수정
@@ -81,7 +89,8 @@ public class ProductController {
         } catch (EntityNotFoundException e) {
             return Response.toErrorResponseEntity(ErrorCode.RESOURCE_NOT_FOUND.getValue(), ErrorCode.RESOURCE_NOT_FOUND.getDescription());
         } catch (IllegalArgumentException e) {
-            return Response.toErrorResponseEntity(ErrorCode.ERR_UNKNOWN.getValue(), e.getMessage());
+            // 권한 문제 또는 입력 오류 시
+            return Response.toErrorResponseEntity(ErrorCode.INVALID_INPUT_VALUE.getValue(), e.getMessage());
         } catch (Exception e) {
             return Response.toErrorResponseEntity(ErrorCode.ERR_UNKNOWN.getValue(), ErrorCode.ERR_UNKNOWN.getDescription());
         }
@@ -100,6 +109,8 @@ public class ProductController {
             return ResponseEntity.ok(DataResponse.success(null, SuccessCode.PRODUCT_DELETE_SUCCESS));
         } catch (EntityNotFoundException e) {
             return Response.toErrorResponseEntity(ErrorCode.RESOURCE_NOT_FOUND.getValue(), ErrorCode.RESOURCE_NOT_FOUND.getDescription());
+        } catch (IllegalArgumentException e) {
+            return Response.toErrorResponseEntity(ErrorCode.INVALID_INPUT_VALUE.getValue(), e.getMessage());
         } catch (Exception e) {
             return Response.toErrorResponseEntity(ErrorCode.ERR_UNKNOWN.getValue(), ErrorCode.ERR_UNKNOWN.getDescription());
         }
