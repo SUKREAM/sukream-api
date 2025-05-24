@@ -2,8 +2,10 @@ package com.sukream.sukream.domains.auth.service;
 
 import com.sukream.sukream.commons.domain.response.Response;
 import com.sukream.sukream.domains.auth.domain.request.LoginRequest;
+import com.sukream.sukream.domains.auth.domain.request.SignInRequest;
 import com.sukream.sukream.domains.auth.domain.response.SocialOAuthResponse;
 import com.sukream.sukream.domains.auth.domain.response.TokenResponse;
+import com.sukream.sukream.domains.auth.mapper.SignInMapper;
 import com.sukream.sukream.domains.auth.repository.UserInfoRepository;
 import com.sukream.sukream.domains.auth.security.JwtTokenProvider;
 import com.sukream.sukream.domains.user.domain.entity.Users;
@@ -20,6 +22,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.sukream.sukream.commons.constants.AuthConstants.*;
@@ -35,10 +38,21 @@ public class AuthService {
 
     private final UserInfoRepository userInfoRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final SignInMapper signInMapper;
 
     public TokenResponse login(HttpServletResponse response, LoginRequest request){
         Users usersInfo = userInfoRepository.findUsersByEmail(request.getEmail()).get();
         return this.makeToken(response, usersInfo);
+    }
+
+    public TokenResponse signIn(HttpServletResponse response, SignInRequest signInRequest){
+        Users users = signInMapper.toEntity(signInRequest);
+        if(users != null) {
+            userInfoRepository.save(users);
+        }
+
+        // TODO: Exception 로직 추가
+        return this.makeToken(response, Objects.requireNonNull(users));
     }
 
     public Response doVerification(HttpServletResponse response, String provider, String accessToken){

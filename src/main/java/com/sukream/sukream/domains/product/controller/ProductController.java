@@ -28,7 +28,8 @@ public class ProductController {
     // 상품 등록
     @Operation(summary = "상품 등록", description = "경매 상품을 등록한다.")
     @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody AddProductRequest requestDto, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<?> createProduct(@RequestBody AddProductRequest requestDto,
+                                           @AuthenticationPrincipal UserPrincipal userPrincipal) {
         try {
             requestDto.setSellerId(userPrincipal.getUser().getId());  // 로그인한 유저 ID로 강제 설정
 
@@ -72,7 +73,7 @@ public class ProductController {
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateProduct(@PathVariable Long id,
                                            @RequestBody UpdateProductRequest requestDto,
-                                            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+                                           @AuthenticationPrincipal UserPrincipal userPrincipal) {
         try {
             // 로그인한 사용자가 해당 상품의 소유자인지 검증
             productService.validateProductOwner(id, userPrincipal.getUser().getId());
@@ -91,7 +92,8 @@ public class ProductController {
     // 상품 삭제
     @Operation(summary = "상품 삭제", description = "상품을 삭제한다.")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id, @AuthenticationPrincipal UserPrincipal userPrincipal)  {
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id,
+                                           @AuthenticationPrincipal UserPrincipal userPrincipal)  {
         try {
             // 로그인한 사용자가 해당 상품의 소유자인지 검증
             productService.validateProductOwner(id, userPrincipal.getUser().getId());

@@ -21,7 +21,7 @@ public class MySalesQueryService {
 
         for(Product product : myProducts) {
             SalesResponseDto dto = SalesResponseDto.builder()
-                    .productId(product.getProductId())
+                    .productId(product.getId())
                     .productName(product.getTitle())
                     .productImage(product.getImage())
                     .status(product.getStatus())

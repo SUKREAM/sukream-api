@@ -41,6 +41,8 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final StringPath description = createString("description");
 
+    public final NumberPath<Long> id = createNumber("id", Long.class);
+
     public final StringPath image = createString("image");
 
     public final NumberPath<Integer> maxPrice = createNumber("maxPrice", Integer.class);
@@ -48,8 +50,6 @@ public class QProduct extends EntityPathBase<Product> {
     public final NumberPath<Integer> minPrice = createNumber("minPrice", Integer.class);
 
     public final com.sukream.sukream.domains.user.domain.entity.QUsers owner;
-
-    public final NumberPath<Long> productId = createNumber("productId", Long.class);
 
     public final EnumPath<ProductStatus> status = createEnum("status", ProductStatus.class);
 

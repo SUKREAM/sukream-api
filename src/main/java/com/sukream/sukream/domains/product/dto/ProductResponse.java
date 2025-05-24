@@ -23,13 +23,13 @@ public class ProductResponse {
     private LocalDateTime deadline;
     private String image;
     private String chatLink;
-    private ProductStatus status;
+    private String status;
     private String auctionNum;
     private int bidCount;
 
     public static ProductResponse fromEntity(Product product) {
         return ProductResponse.builder()
-                .productId(product.getProductId())
+                .productId(product.getId())
                 .sellerId(product.getOwner().getId())
                 .title(product.getTitle())
                 .description(product.getDescription())
@@ -42,7 +42,7 @@ public class ProductResponse {
                 .deadline(product.getDeadline())
                 .image(product.getImage())
                 .chatLink(product.getChatLink())
-                .status(product.getStatus())
+                .status(product.getStatus().getDescription())
                 .auctionNum(product.getAuctionNum())
                 .bidCount(product.getBidCount())
                 .build();
