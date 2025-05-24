@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.UUID;
 
 @Service
@@ -58,12 +57,9 @@ public class ProductService {
         return ProductResponse.fromEntity(product);
     }
 
-    // 상품 목록 조회
-    @Transactional(readOnly = true)
-    public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll().stream()
-                .map(ProductResponse::fromEntity)
-                .collect(Collectors.toList());
+    // 카테고리 별 상품 목록 조회 및 정렬
+    public List<ProductResponse> getAllProducts(String category, String sort) {
+        return productRepository.findByCategoryAndSort(category, sort);
     }
 
     // 상품 수정

@@ -45,7 +45,7 @@ public class ProductController {
     // 상품 단건 조회
     @Operation(summary = "상품 상세 조회", description = "상품을 id로 상세 조회한다.")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getProduct(@PathVariable Long id) {
+    public ResponseEntity<?> getProductById(@PathVariable Long id) {
         try {
             ProductResponse responseDto = productService.getProduct(id);
             return ResponseEntity.ok(DataResponse.success(responseDto, SuccessCode.PRODUCT_READ_SUCCESS));
@@ -56,16 +56,14 @@ public class ProductController {
         }
     }
 
-    // 상품 전체 조회
-    @Operation(summary = "상품 목록 조회", description = "전체 상품 리스트를 조회한다.")
+    // 카테고리별 상품 전체 조회 및 정렬
+    @Operation(summary = "상품 목록 조회", description = "상품을 인기순, 등록순 정렬하고 카테고리별 조회한다.")
     @GetMapping
-    public ResponseEntity<?> getAllProducts() {
-        try {
-            List<ProductResponse> products = productService.getAllProducts();
-            return ResponseEntity.ok(DataResponse.success(products, SuccessCode.PRODUCT_READ_SUCCESS));
-        } catch (Exception e) {
-            return Response.toErrorResponseEntity(ErrorCode.ERR_UNKNOWN.getValue(), ErrorCode.ERR_UNKNOWN.getDescription());
-        }
+    public List<ProductResponse> getProductsByCategoryAndSort(
+            @RequestParam(required = false) String category,
+            @RequestParam(defaultValue = "latest") String sort
+    ) {
+        return productService.getAllProducts(category, sort);
     }
 
     // 상품 수정
