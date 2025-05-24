@@ -21,14 +21,14 @@ public class ReviewService {
     @Transactional
     public void createReview(Users user, CreateReviewRequest request) {
         //1. 낙찰자인지 확인
-        boolean isAwarded = bidderRepository.existsByUser_IdAndProduct_ProductIdAndIsAwardedTrue(user.getId(), request.getProductId());
+        boolean isAwarded = bidderRepository.existsByUser_IdAndProduct_IdAndIsAwardedTrue(user.getId(), request.getProductId());
 
         if(!isAwarded) {
             throw new IllegalArgumentException("리뷰 작성 권한이 없습니다. ");
         }
 
         //2. 리뷰 중복 여부 확인
-        boolean alreadyExists = reviewRepository.existsByWriterIdAndProductProductId(user.getId(), request.getProductId());
+        boolean alreadyExists = reviewRepository.existsByWriterIdAndProductId(user.getId(), request.getProductId());
         if(!alreadyExists) {
             throw new IllegalArgumentException("이미 리뷰를 작성한 상품입니다.");
         }
