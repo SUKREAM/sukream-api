@@ -29,7 +29,7 @@ public class ReviewService {
 
         //2. 리뷰 중복 여부 확인
         boolean alreadyExists = reviewRepository.existsByWriterIdAndProductProductId(user.getId(), request.getProductId());
-        if(!alreadyExists) {
+        if(alreadyExists) {
             throw new IllegalArgumentException("이미 리뷰를 작성한 상품입니다.");
         }
 
