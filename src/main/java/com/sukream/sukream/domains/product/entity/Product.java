@@ -84,4 +84,18 @@ public class Product extends BaseTimeEntity {
         return LocalDateTime.now().isAfter(this.deadline);
     }
 
+    // 입찰 가능 여부
+    public boolean isBiddable() {
+        return this.status == ProductStatus.OPEN && !isBidDeadlinePassed();
+    }
+
+    // 경매 마감 상태
+    public void closeAuction() {
+        this.status = ProductStatus.CLOSED;
+    }
+
+    // 낙찰 완료 상태
+    public void awardAuction() {
+        this.status = ProductStatus.AWARDED;
+    }
 }

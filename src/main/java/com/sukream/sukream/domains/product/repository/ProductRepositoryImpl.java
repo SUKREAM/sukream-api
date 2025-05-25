@@ -3,6 +3,7 @@ package com.sukream.sukream.domains.product.repository;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sukream.sukream.domains.product.dto.ProductResponse;
+import com.sukream.sukream.domains.product.entity.Product;
 import com.sukream.sukream.domains.product.entity.QProduct;
 import com.sukream.sukream.domains.bidder.entity.QBidder;
 import lombok.RequiredArgsConstructor;
@@ -68,5 +69,17 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     return ProductResponse.fromEntityAndBidCount(tuple.get(product), bidCount);
                 })
                 .toList();
+    }
+
+    @Override
+    public List<Product> findAllForDeadlineCheck(String category) {
+        QProduct product = QProduct.product;
+
+        var query = queryFactory.selectFrom(product);
+
+        if (category != null && !category.isEmpty()) {
+            query.where(product.category.eq(category));
+        }
+        return query.fetch();
     }
 }

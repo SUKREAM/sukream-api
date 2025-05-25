@@ -23,6 +23,7 @@ public enum ErrorCode {
     BID_INVALID_AMOUNT(400, "유효하지 않은 입찰 금액입니다."),
     BID_DEADLINE_EXCEEDED(400, "입찰 마감 시간이 지나 입찰할 수 없습니다."),
     USER_NO_FOUND(404, "사용자가 존재하지 않습니다."),
+    BID_ALREADY_AWARDED(400, "이미 낙찰된 상품에는 입찰할 수 없습니다."),
 
     // 낙찰 관련 에러
     BIDDER_NOT_FOUND(404, "요청한 입찰자를 찾을 수 없습니다."),

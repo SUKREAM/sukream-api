@@ -49,23 +49,35 @@ public class ProductService {
         return productRepository.save(product).getId();
     }
 
-    // 상품 상세 조회 (입찰 수 실시간 집계 반영)
-    @Transactional(readOnly = true)
+    // 상품 상세 조회
+    @Transactional
     public ProductResponse getProduct(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다."));
 
+        // 마감 여부 확인 및 상태 변경
+        if (product.isBidDeadlinePassed() && product.getStatus() == ProductStatus.OPEN) {
+            product.closeAuction();
+        }
         // 입찰 수 실시간 조회
         int bidCount = bidderRepository.countByProduct_Id(id);
 
         return ProductResponse.fromEntityAndBidCount(product, bidCount);
     }
 
-    // 카테고리 별 상품 목록 조회 및 정렬 (입찰 수 집계 반영)
-    @Transactional(readOnly = true)
+    // 카테고리 별 상품 목록 조회 및 정렬
+    @Transactional
     public List<ProductResponse> getAllProducts(String category, String sort) {
+        List<Product> productsForDeadlineCheck = productRepository.findAllForDeadlineCheck(category);
+
+        for (Product product : productsForDeadlineCheck) {
+            if (product.isBidDeadlinePassed() && product.getStatus() == ProductStatus.OPEN) {
+                product.closeAuction();
+            }
+        }
         return productRepository.findByCategoryAndSort(category, sort);
     }
+
 
     // 상품 수정
     @Transactional

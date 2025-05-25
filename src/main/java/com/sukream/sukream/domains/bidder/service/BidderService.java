@@ -9,6 +9,7 @@ import com.sukream.sukream.domains.bidder.entity.BidderStatus;
 import com.sukream.sukream.domains.bidder.exception.*;
 import com.sukream.sukream.domains.bidder.repository.BidderRepository;
 import com.sukream.sukream.domains.product.entity.Product;
+import com.sukream.sukream.domains.product.entity.ProductStatus;
 import com.sukream.sukream.domains.product.repository.ProductRepository;
 import com.sukream.sukream.domains.user.domain.entity.Users;
 import jakarta.transaction.Transactional;
@@ -103,6 +104,15 @@ public class BidderService {
             throw new BidAlreadyPlacedException();
         }
 
+        // product 경매 마감 or 낙찰 완료 시 입찰하면 예외 발생
+        if (product.getStatus() == ProductStatus.CLOSED) {
+            throw new BidDeadlineExceededException();
+        }
+
+        if (product.getStatus() == ProductStatus.AWARDED) {
+            throw new BidAlreadyAwardedException();
+        }
+
         // 가격 유효성 검사 (예: 0 이하 금지)
         if (bidRequest.getPrice() <= 0) {
             throw new BidInvalidAmountException();
@@ -139,6 +149,7 @@ public class BidderService {
         }
 
         bidder.award();
+        product.awardAuction(); // product status 변경
         return bidder;
     }
 
