@@ -48,9 +48,6 @@ public class Product extends BaseTimeEntity {
     @Column(name = "auction_num", nullable = false)
     private String auctionNum;
 
-    @Column(name = "bid_count", nullable = false)
-    private int bidCount;
-
     @Column(name = "bid_unit", nullable = false)
     private int bidUnit;
 
@@ -87,16 +84,18 @@ public class Product extends BaseTimeEntity {
         return LocalDateTime.now().isAfter(this.deadline);
     }
 
-    // 입찰 들어올 때 입찰 수 1 증가
-    public void increaseBidCount() {
-        this.bidCount++;
+    // 입찰 가능 여부
+    public boolean isBiddable() {
+        return this.status == ProductStatus.OPEN && !isBidDeadlinePassed();
     }
 
-    // 입찰 취소 or 삭제된 경우 입찰 수 감소
-    public void decreaseBidCount() {
-        if (this.bidCount > 0) {
-            this.bidCount--;
-        }
+    // 경매 마감 상태
+    public void closeAuction() {
+        this.status = ProductStatus.CLOSED;
     }
 
+    // 낙찰 완료 상태
+    public void awardAuction() {
+        this.status = ProductStatus.AWARDED;
+    }
 }

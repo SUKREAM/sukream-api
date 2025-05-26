@@ -1,12 +1,13 @@
 package com.sukream.sukream.domains.product.service;
 
 import com.sukream.sukream.domains.auth.repository.UserInfoRepository;
+import com.sukream.sukream.domains.bidder.repository.BidderRepository;
+import com.sukream.sukream.domains.product.repository.ProductRepository;
 import com.sukream.sukream.domains.product.dto.AddProductRequest;
 import com.sukream.sukream.domains.product.dto.ProductResponse;
 import com.sukream.sukream.domains.product.dto.UpdateProductRequest;
 import com.sukream.sukream.domains.product.entity.Product;
 import com.sukream.sukream.domains.product.entity.ProductStatus;
-import com.sukream.sukream.domains.product.repository.ProductRepository;
 import com.sukream.sukream.domains.user.domain.entity.Users;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.UUID;
 
 @Service
@@ -23,13 +23,13 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final UserInfoRepository userInfoRepository;
+    private final BidderRepository bidderRepository;
 
     // 상품 등록
     @Transactional
     public Long createProduct(AddProductRequest requestDto) {
         Users seller = userInfoRepository.findById(requestDto.getSellerId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 판매자를 찾을 수 없습니다."));
-
 
         Product product = Product.builder()
                 .owner(seller)
@@ -41,7 +41,6 @@ public class ProductService {
                 .bidUnit(requestDto.getBidUnit())
                 .deadline(requestDto.getDeadline())
                 .status(ProductStatus.OPEN)
-                .bidCount(0)
                 .auctionNum(generateAuctionNum())
                 .image(requestDto.getImage())
                 .chatLink(requestDto.getChatLink())
@@ -50,21 +49,35 @@ public class ProductService {
         return productRepository.save(product).getId();
     }
 
-    // 상품 조회
-    @Transactional(readOnly = true)
+    // 상품 상세 조회
+    @Transactional
     public ProductResponse getProduct(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다."));
-        return ProductResponse.fromEntity(product);
+
+        // 마감 여부 확인 및 상태 변경
+        if (product.isBidDeadlinePassed() && product.getStatus() == ProductStatus.OPEN) {
+            product.closeAuction();
+        }
+        // 입찰 수 실시간 조회
+        int bidCount = bidderRepository.countByProduct_Id(id);
+
+        return ProductResponse.fromEntityAndBidCount(product, bidCount);
     }
 
-    // 상품 목록 조회
-    @Transactional(readOnly = true)
-    public List<ProductResponse> getAllProducts() {
-        return productRepository.findAll().stream()
-                .map(ProductResponse::fromEntity)
-                .collect(Collectors.toList());
+    // 카테고리 별 상품 목록 조회 및 정렬
+    @Transactional
+    public List<ProductResponse> getAllProducts(String category, String sort) {
+        List<Product> productsForDeadlineCheck = productRepository.findAllForDeadlineCheck(category);
+
+        for (Product product : productsForDeadlineCheck) {
+            if (product.isBidDeadlinePassed() && product.getStatus() == ProductStatus.OPEN) {
+                product.closeAuction();
+            }
+        }
+        return productRepository.findByCategoryAndSort(category, sort);
     }
+
 
     // 상품 수정
     @Transactional
@@ -84,7 +97,7 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
-    // 소유자 검증 메서드 추가 (수정된 부분)
+    // 소유자 검증 메서드
     @Transactional(readOnly = true)
     public void validateProductOwner(Long productId, Long userId) {
         Product product = productRepository.findById(productId)
@@ -95,9 +108,7 @@ public class ProductService {
         }
     }
 
-
     private String generateAuctionNum() {
         return UUID.randomUUID().toString();
     }
-
 }

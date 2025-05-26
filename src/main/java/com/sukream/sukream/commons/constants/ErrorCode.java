@@ -11,6 +11,7 @@ public enum ErrorCode {
     SUCCESS(200, "Success !!(200)"),
     DELETE_FAIL(501, "Delete Resource Failed(501)"),
     UPDATE_FAIL(502, "Update Resource Failed(502)"),
+    INVALID_INPUT_VALUE(400, "입력값이 올바르지 않습니다."),
     RESOURCE_NOT_FOUND(404, "Resource Not Found(404)"),
     FORBIDDEN(403, "접근 권한이 없습니다."),
 
@@ -22,6 +23,7 @@ public enum ErrorCode {
     BID_INVALID_AMOUNT(400, "유효하지 않은 입찰 금액입니다."),
     BID_DEADLINE_EXCEEDED(400, "입찰 마감 시간이 지나 입찰할 수 없습니다."),
     USER_NO_FOUND(404, "사용자가 존재하지 않습니다."),
+    BID_ALREADY_AWARDED(400, "이미 낙찰된 상품에는 입찰할 수 없습니다."),
 
     // 낙찰 관련 에러
     BIDDER_NOT_FOUND(404, "요청한 입찰자를 찾을 수 없습니다."),

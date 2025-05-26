@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class ProductResponse {
-    private Long productId;
+    private Long id;
     private Long sellerId;
     private String title;
     private String description;
@@ -27,9 +27,9 @@ public class ProductResponse {
     private String auctionNum;
     private int bidCount;
 
-    public static ProductResponse fromEntity(Product product) {
+    public static ProductResponse fromEntityAndBidCount(Product product, int bidCount) {
         return ProductResponse.builder()
-                .productId(product.getId())
+                .id(product.getId())
                 .sellerId(product.getOwner().getId())
                 .title(product.getTitle())
                 .description(product.getDescription())
@@ -44,7 +44,7 @@ public class ProductResponse {
                 .chatLink(product.getChatLink())
                 .status(product.getStatus().getDescription())
                 .auctionNum(product.getAuctionNum())
-                .bidCount(product.getBidCount())
+                .bidCount(bidCount)
                 .build();
     }
 }

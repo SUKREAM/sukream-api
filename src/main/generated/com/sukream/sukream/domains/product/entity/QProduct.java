@@ -26,8 +26,6 @@ public class QProduct extends EntityPathBase<Product> {
 
     public final StringPath auctionNum = createString("auctionNum");
 
-    public final NumberPath<Integer> bidCount = createNumber("bidCount", Integer.class);
-
     public final NumberPath<Integer> bidUnit = createNumber("bidUnit", Integer.class);
 
     public final StringPath category = createString("category");
