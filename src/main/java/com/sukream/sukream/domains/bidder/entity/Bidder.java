@@ -28,9 +28,6 @@ public class Bidder extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer price;
 
-    @Column(name = "is_awarded", nullable = false)
-    private Boolean isAwarded;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private BidderStatus status;
@@ -49,10 +46,9 @@ public class Bidder extends BaseTimeEntity {
     private LocalDateTime awardedAt; // 낙찰 시간
 
     @Builder
-    public Bidder(Users user, Integer price, Boolean isAwarded, BidderStatus status, Product product, String nickname, LocalDateTime bidAt) {
+    public Bidder(Users user, Integer price, BidderStatus status, Product product, String nickname, LocalDateTime bidAt) {
         this.user = user;
         this.price = price;
-        this.isAwarded = isAwarded == null ? false : isAwarded;
         this.status = status == null ? BidderStatus.PENDING : status;
         this.product = product;
         this.nickname = nickname;
@@ -64,9 +60,6 @@ public class Bidder extends BaseTimeEntity {
         if (this.bidAt == null) {
             this.bidAt = LocalDateTime.now();
         }
-        if (this.isAwarded == null) {
-            this.isAwarded = false;
-        }
         if (this.status == null) {
             this.status = BidderStatus.PENDING;
         }
@@ -74,14 +67,12 @@ public class Bidder extends BaseTimeEntity {
 
     // 낙찰 처리
     public void award() {
-        this.isAwarded = true;
         this.status = BidderStatus.AWARDED;
         this.awardedAt = LocalDateTime.now();
     }
 
     // 상태 초기화
     public void pending() {
-        this.isAwarded = false;
         this.status = BidderStatus.PENDING;
     }
 }

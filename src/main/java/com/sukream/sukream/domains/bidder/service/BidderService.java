@@ -124,7 +124,6 @@ public class BidderService {
                 .user(user)
                 .price(bidRequest.getPrice())
                 .status(BidderStatus.PENDING)
-                .isAwarded(false)
                 .bidAt(LocalDateTime.now())
                 .nickname(bidRequest.getNickname())
                 .build();
