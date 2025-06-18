@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +46,28 @@ public class AuthController {
     @PostMapping("/signin")
     public TokenResponse doSignIn(HttpServletResponse response, SignInRequest signInRequest) {
         return authService.signIn(response, signInRequest);
+    }
+
+    /**
+     * 아이디 (이메일) 찾기 Controller
+     */
+    @Operation(summary = "아이디 찾기", description = """
+             전화번호 기반 SMS 전송으로 아이디 (이메일) 찾기
+            """)
+    @PostMapping("/find-email")
+    public HttpStatus findEmail(String phoneNumber) {
+        return authService.findEmail(phoneNumber);
+    }
+
+    /**
+     * 비밀번호 찾기 Controller
+     */
+    @Operation(summary = "비밀번호 찾기", description = """
+             ID인 이메일 SMTP 전송으로 비밀번호 찾기
+            """)
+    @PostMapping("/find-pw")
+    public HttpStatus findPassword(String email) {
+        return authService.findPassword(email);
     }
 
     /**

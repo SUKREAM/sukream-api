@@ -111,7 +111,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+    // Email SMTP
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    implementation 'net.nurigo:javaSDK:2.2'
 
 }
 
