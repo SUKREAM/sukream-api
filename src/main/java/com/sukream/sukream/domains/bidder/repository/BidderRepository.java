@@ -1,6 +1,7 @@
 package com.sukream.sukream.domains.bidder.repository;
 
 import com.sukream.sukream.domains.bidder.entity.Bidder;
+import com.sukream.sukream.domains.bidder.entity.BidderStatus;
 import com.sukream.sukream.domains.product.entity.Product;
 import com.sukream.sukream.domains.user.domain.entity.Users;
 import feign.Param;
@@ -24,6 +25,8 @@ public interface BidderRepository extends JpaRepository<Bidder, Long> {
     boolean existsByProductAndUser(Product product, Users user);
 
     //특정 경매 - userid, productid, isAwarded 통해 검증
-    boolean existsByUser_IdAndProduct_IdAndIsAwardedTrue(Long userId, Long productId);
+    boolean existsByUser_IdAndProduct_IdAndStatus(Long userId, Long productId, BidderStatus status);
 
+    // 입찰 수 계산
+    int countByProduct_Id(Long productId);
 }

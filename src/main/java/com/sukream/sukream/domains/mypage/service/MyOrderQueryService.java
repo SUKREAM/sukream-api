@@ -1,6 +1,7 @@
 package com.sukream.sukream.domains.mypage.service;
 
 import com.sukream.sukream.domains.bidder.entity.Bidder;
+import com.sukream.sukream.domains.bidder.entity.BidderStatus;
 import com.sukream.sukream.domains.bidder.repository.BidderRepository;
 import com.sukream.sukream.domains.mypage.domain.dto.OrderResponseDto;
 import com.sukream.sukream.domains.user.domain.dto.UserPrincipal;
@@ -25,11 +26,11 @@ public class MyOrderQueryService {
         for (Bidder bidder : allBids) {
             var product = bidder.getProduct();
 
-            String status = bidder.getIsAwarded() ? "낙찰완료" : "낙찰대기";
+            String status = bidder.getStatus() == BidderStatus.AWARDED ? "낙찰완료" : "낙찰대기";
 
-            LocalDateTime orderDate = bidder.getIsAwarded() && bidder.getAwardedAt() != null
-                    ?bidder.getAwardedAt() //낙찰시간
-                    :bidder.getBidAt(); //입찰시간
+            LocalDateTime orderDate = bidder.getStatus() == BidderStatus.AWARDED && bidder.getAwardedAt() != null
+                    ? bidder.getAwardedAt()
+                    : bidder.getBidAt();
 
             OrderResponseDto dto = OrderResponseDto.builder()
                     .orderId(bidder.getId())
