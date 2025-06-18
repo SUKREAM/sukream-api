@@ -58,7 +58,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/reviews/me/received").authenticated()
 
                                 // 그 외는 모두 허용
-                                .anyRequest().authenticated())
+                                .anyRequest().permitAll())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
