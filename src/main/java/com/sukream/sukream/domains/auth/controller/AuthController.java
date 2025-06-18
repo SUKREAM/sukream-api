@@ -55,7 +55,7 @@ public class AuthController {
              전화번호 기반 SMS 전송으로 아이디 (이메일) 찾기
             """)
     @PostMapping("/find-email")
-    public HttpStatus findEmail(String phoneNumber) {
+    public HttpStatus findEmail(@RequestParam("phoneNumber") String phoneNumber) {
         return authService.findEmail(phoneNumber);
     }
 
@@ -66,7 +66,7 @@ public class AuthController {
              ID인 이메일 SMTP 전송으로 비밀번호 찾기
             """)
     @PostMapping("/find-pw")
-    public HttpStatus findPassword(String email) {
+    public HttpStatus findPassword(@RequestParam("email") String email) {
         return authService.findPassword(email);
     }
 
