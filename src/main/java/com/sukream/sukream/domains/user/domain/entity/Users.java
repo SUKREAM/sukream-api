@@ -1,6 +1,7 @@
 package com.sukream.sukream.domains.user.domain.entity;
 
 import com.sukream.sukream.commons.jpa.BaseTimeEntity;
+import com.sukream.sukream.domains.user.domain.request.UserRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import jakarta.validation.constraints.NotNull;
@@ -58,4 +59,15 @@ public class Users extends BaseTimeEntity {
     protected void onCreate() {
         this.isActive = true;
     }
+
+
+    public void updateUserInfo(UserRequest userRequest) {
+        this.name = userRequest.getName();
+        this.email = userRequest.getEmail();
+        this.phoneNumber = userRequest.getPhoneNumber();
+        this.password = userRequest.getPassword();
+        this.profileImage = userRequest.getProfileImage();
+    }
+
+
 }

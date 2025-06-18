@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -38,7 +39,19 @@ public class AuthService {
 
     private final UserInfoRepository userInfoRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final MessageDelegate messageDelegate;
+    private final EmailClient emailClient;
     private final SignInMapper signInMapper;
+
+    public HttpStatus findEmail(String phoneNumber) {
+        return messageDelegate.sendSMS(phoneNumber);
+    }
+
+    public HttpStatus findPassword(String email){
+        Users userInfo = userInfoRepository.findUsersByEmail(email).get();
+        return emailClient.sendOneEmail(userInfo.getEmail(), userInfo.getPassword());
+    }
+
 
     public TokenResponse login(HttpServletResponse response, LoginRequest request){
         Users usersInfo = userInfoRepository.findUsersByEmail(request.getEmail()).get();
@@ -54,6 +67,7 @@ public class AuthService {
         // TODO: Exception 로직 추가
         return this.makeToken(response, Objects.requireNonNull(users));
     }
+
 
     public Response doVerification(HttpServletResponse response, String provider, String accessToken){
 
