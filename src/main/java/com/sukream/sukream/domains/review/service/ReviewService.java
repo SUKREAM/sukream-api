@@ -91,4 +91,41 @@ public class ReviewService {
                 .reviews(reviewResponses)
                 .build();
     }
+
+
+    public ReceivedReviewSummaryResponse getReceivedReviewsByUserId(Long userId) {
+        List<Review> reviews = reviewRepository.findByProduct_Owner_Id(userId);
+
+        if (reviews.isEmpty()) {
+            return ReceivedReviewSummaryResponse.builder()
+                    .userName("") // or "unknown"
+                    .averageRating(0)
+                    .reviews(Collections.emptyList())
+                    .build();
+        }
+
+        String userName = reviews.get(0).getProduct().getOwner().getName();
+
+        double averageRating = reviews.stream()
+                .mapToInt(Review::getRating)
+                .average()
+                .orElse(0);
+
+        List<ReceivedReviewResponse> reviewResponses = reviews.stream()
+                .map(review -> ReceivedReviewResponse.builder()
+                        .productId(review.getProduct().getId())
+                        .productName(review.getProduct().getTitle())
+                        .rating(review.getRating())
+                        .content(review.getContent())
+                        .qualityAssesment(review.getQualityAssessment())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ReceivedReviewSummaryResponse.builder()
+                .userName(userName)
+                .averageRating(averageRating)
+                .reviews(reviewResponses)
+                .build();
+    }
+
 }

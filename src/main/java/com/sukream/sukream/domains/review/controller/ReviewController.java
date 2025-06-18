@@ -28,4 +28,10 @@ public class ReviewController {
     public ReceivedReviewSummaryResponse getReceivedReviews(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return reviewService.getReceivedReviews(userPrincipal.getUser().getId());
     }
+
+
+    @GetMapping("/users/{userId}/reviews")
+    public ReceivedReviewSummaryResponse getUserReceivedReviews(@PathVariable Long userId) {
+        return reviewService.getReceivedReviewsByUserId(userId);
+    }
 }

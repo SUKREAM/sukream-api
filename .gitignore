@@ -4,6 +4,7 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+Q*
 
 ### STS ###
 .apt_generated
@@ -45,3 +46,4 @@ build.gradle
 /generated/
 
 
+src/main/generated/
