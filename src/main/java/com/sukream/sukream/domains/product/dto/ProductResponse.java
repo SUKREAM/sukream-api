@@ -1,7 +1,6 @@
 package com.sukream.sukream.domains.product.dto;
 
 import com.sukream.sukream.domains.product.entity.Product;
-import com.sukream.sukream.domains.product.entity.ProductStatus;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -13,6 +12,7 @@ import java.util.Base64;
 public class ProductResponse {
     private Long id;
     private Long sellerId;
+    private String sellerName;    // 추가된 필드
     private String title;
     private String description;
     private int minPrice;
@@ -32,6 +32,7 @@ public class ProductResponse {
         return ProductResponse.builder()
                 .id(product.getId())
                 .sellerId(product.getOwner().getId())
+                .sellerName(product.getOwner().getName())  // 추가
                 .title(product.getTitle())
                 .description(product.getDescription())
                 .minPrice(product.getMinPrice())
