@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 @Getter
 @Builder
@@ -40,7 +41,7 @@ public class ProductResponse {
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
                 .deadline(product.getDeadline())
-                .image(product.getImage())
+                .image(product.getImage() != null ? Base64.getEncoder().encodeToString(product.getImage()) : null)
                 .chatLink(product.getChatLink())
                 .status(product.getStatus().getDescription())
                 .auctionNum(product.getAuctionNum())

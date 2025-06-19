@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -20,10 +21,15 @@ public class MySalesQueryService {
         List<SalesResponseDto> result = new ArrayList<>();
 
         for(Product product : myProducts) {
+            String base64Image = null;
+            if (product.getImage() != null) {
+                base64Image = Base64.getEncoder().encodeToString(product.getImage());
+            }
+
             SalesResponseDto dto = SalesResponseDto.builder()
                     .productId(product.getId())
                     .productName(product.getTitle())
-                    .productImage(product.getImage())
+                    .productImage(base64Image)
                     .status(product.getStatus())
                     .createdAt(product.getCreatedAt())
                     .build();
