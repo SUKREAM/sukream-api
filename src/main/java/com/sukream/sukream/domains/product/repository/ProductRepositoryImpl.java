@@ -3,7 +3,6 @@ package com.sukream.sukream.domains.product.repository;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sukream.sukream.domains.product.dto.ProductResponse;
-import com.sukream.sukream.domains.product.entity.Product;
 import com.sukream.sukream.domains.product.entity.QProduct;
 import com.sukream.sukream.domains.bidder.entity.QBidder;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,24 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 
         var bidCountExpr = bidder.count();
 
-        var query = queryFactory.select(product, bidCountExpr)
+        // image 필드는 제외하고 필요한 필드만 select
+        var query = queryFactory.select(
+                        product.id,
+                        product.owner.id,
+                        product.title,
+                        product.description,
+                        product.minPrice,
+                        product.maxPrice,
+                        product.category,
+                        product.bidUnit,
+                        product.createdAt,
+                        product.updatedAt,
+                        product.deadline,
+                        product.chatLink,
+                        product.status.stringValue(),  // enum -> string
+                        product.auctionNum,
+                        bidCountExpr
+                )
                 .from(product)
                 .leftJoin(bidder).on(bidder.product.id.eq(product.id));
 
@@ -45,7 +61,6 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 product.createdAt,
                 product.deadline,
                 product.description,
-                product.image,
                 product.maxPrice,
                 product.minPrice,
                 product.owner.id,
@@ -60,19 +75,57 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
             query.orderBy(product.createdAt.desc());
         }
 
-        List<Tuple> result = query.fetch();
+        List<Tuple> results = query.fetch();
 
-        return result.stream()
+        return results.stream()
                 .map(tuple -> {
-                    Long bidCountObj = tuple.get(bidCountExpr);
-                    int bidCount = bidCountObj == null ? 0 : bidCountObj.intValue();
-                    return ProductResponse.fromEntityAndBidCount(tuple.get(product), bidCount);
+                    Long id = tuple.get(product.id);
+                    Long ownerId = tuple.get(product.owner.id);
+                    String title = tuple.get(product.title);
+                    String description = tuple.get(product.description);
+                    Integer minPriceObj = tuple.get(product.minPrice);
+                    int minPrice = minPriceObj != null ? minPriceObj : 0;
+                    Integer maxPriceObj = tuple.get(product.maxPrice);
+                    int maxPrice = maxPriceObj != null ? maxPriceObj : 0;
+                    String categoryVal = tuple.get(product.category);
+                    Integer bidUnitObj = tuple.get(product.bidUnit);
+                    int bidUnit = bidUnitObj != null ? bidUnitObj : 0;
+                    java.time.LocalDateTime createdAt = tuple.get(product.createdAt);
+                    java.time.LocalDateTime updatedAt = tuple.get(product.updatedAt);
+                    java.time.LocalDateTime deadline = tuple.get(product.deadline);
+                    String chatLink = tuple.get(product.chatLink);
+                    String status = tuple.get(product.status.stringValue());
+                    String auctionNum = tuple.get(product.auctionNum);
+                    Long bidCountLong = tuple.get(bidCountExpr);
+                    int bidCount = bidCountLong != null ? bidCountLong.intValue() : 0;
+
+                    // image는 DB BLOB이므로 목록에서는 null 처리 (필요 시 상세 조회에서 따로 처리)
+                    String image = null;
+
+                    return ProductResponse.builder()
+                            .id(id)
+                            .sellerId(ownerId) // 괄호 수정
+                            .title(title)
+                            .description(description)
+                            .minPrice(minPrice)
+                            .maxPrice(maxPrice)
+                            .category(categoryVal)
+                            .bidUnit(bidUnit)
+                            .createdAt(createdAt)
+                            .updatedAt(updatedAt)
+                            .deadline(deadline)
+                            .chatLink(chatLink)
+                            .status(status)
+                            .auctionNum(auctionNum)
+                            .image(image)
+                            .bidCount(bidCount)
+                            .build();
                 })
                 .toList();
     }
 
     @Override
-    public List<Product> findAllForDeadlineCheck(String category) {
+    public List<com.sukream.sukream.domains.product.entity.Product> findAllForDeadlineCheck(String category) {
         QProduct product = QProduct.product;
 
         var query = queryFactory.selectFrom(product);

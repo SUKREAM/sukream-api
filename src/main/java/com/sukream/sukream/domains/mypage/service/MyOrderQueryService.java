@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -32,11 +33,16 @@ public class MyOrderQueryService {
                     ? bidder.getAwardedAt()
                     : bidder.getBidAt();
 
+            String base64Image = null;
+            if (product.getImage() != null) {
+                base64Image = Base64.getEncoder().encodeToString(product.getImage());
+            }
+
             OrderResponseDto dto = OrderResponseDto.builder()
                     .orderId(bidder.getId())
                     .productId(product.getId())
                     .productName(product.getTitle())
-                    .productImage(product.getImage())
+                    .productImage(base64Image)
                     .orderDate(orderDate)
                     .status(status)
                     .build();

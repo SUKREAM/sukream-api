@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,7 +43,7 @@ public class ProductService {
                 .deadline(requestDto.getDeadline())
                 .status(ProductStatus.OPEN)
                 .auctionNum(generateAuctionNum())
-                .image(requestDto.getImage())
+                .image(requestDto.getImage() != null ? Base64.getDecoder().decode(requestDto.getImage()) : null)
                 .chatLink(requestDto.getChatLink())
                 .build();
 

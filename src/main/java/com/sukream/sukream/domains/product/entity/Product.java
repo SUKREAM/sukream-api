@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.sukream.sukream.domains.user.domain.entity.Users;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 @EntityListeners(AuditingEntityListener.class)
 @Entity
@@ -55,8 +56,9 @@ public class Product extends BaseTimeEntity {
     private String category;
 
     // 이미지
-    @Column(name = "image_url", nullable = false)
-    private String image;
+    @Lob
+    @Column(name = "image_blob", nullable = true)
+    private byte[] image;
 
     // 오픈채팅방 링크
     @Column(name = "chat_link")
@@ -70,7 +72,7 @@ public class Product extends BaseTimeEntity {
         this.category = requestDto.getCategory();
         this.bidUnit = requestDto.getBidUnit();
         this.deadline = requestDto.getDeadline();
-        this.image = requestDto.getImage();
+        this.image = requestDto.getImage() != null ? Base64.getDecoder().decode(requestDto.getImage()) : null;
         this.chatLink = requestDto.getChatLink();
         this.status = ProductStatus.valueOf(requestDto.getStatus().toUpperCase());
     }
