@@ -27,8 +27,9 @@ public class ProductResponse {
     private String status;
     private String auctionNum;
     private int bidCount;
+    private Long currentHighestPrice;
 
-    public static ProductResponse fromEntityAndBidCount(Product product, int bidCount) {
+    public static ProductResponse fromEntityAndBidCountAndHighestPrice(Product product, int bidCount, Long highestPrice) {
         return ProductResponse.builder()
                 .id(product.getId())
                 .sellerId(product.getOwner().getId())
@@ -47,6 +48,7 @@ public class ProductResponse {
                 .status(product.getStatus().getDescription())
                 .auctionNum(product.getAuctionNum())
                 .bidCount(bidCount)
+                .currentHighestPrice(highestPrice != null ? highestPrice : 0L)
                 .build();
     }
 }
