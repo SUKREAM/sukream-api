@@ -6,9 +6,17 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-@Builder
 public class ReceivedReviewSummaryResponse {
-    private String userName;
-    private double averageRating;
-    private List<ReceivedReviewResponse> reviews;
+    private final String userName;
+    private final double averageRating;
+    private final int reviewCount;
+    private final List<ReceivedReviewResponse> reviews;
+
+    @Builder
+    public ReceivedReviewSummaryResponse(String userName, double averageRating, int reviewCount, List<ReceivedReviewResponse> reviews) {
+        this.userName = userName;
+        this.averageRating = averageRating;
+        this.reviewCount = reviewCount;
+        this.reviews = reviews;
+    }
 }

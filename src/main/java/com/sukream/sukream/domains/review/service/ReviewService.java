@@ -98,6 +98,7 @@ public class ReviewService {
         return ReceivedReviewSummaryResponse.builder()
                 .userName(userName)
                 .averageRating(averageRating)
+                .reviewCount(reviews.size())
                 .reviews(reviewResponses)
                 .build();
     }
