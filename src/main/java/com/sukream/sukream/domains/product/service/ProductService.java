@@ -2,6 +2,7 @@ package com.sukream.sukream.domains.product.service;
 
 import com.sukream.sukream.domains.auth.repository.UserInfoRepository;
 import com.sukream.sukream.domains.bidder.repository.BidderRepository;
+import com.sukream.sukream.domains.product.dto.AuctionProductInfoResponse;
 import com.sukream.sukream.domains.product.repository.ProductRepository;
 import com.sukream.sukream.domains.product.dto.AddProductRequest;
 import com.sukream.sukream.domains.product.dto.ProductResponse;
@@ -14,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
@@ -112,4 +115,30 @@ public class ProductService {
     private String generateAuctionNum() {
         return UUID.randomUUID().toString();
     }
+
+    public AuctionProductInfoResponse getAuctionProductInfo(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다."));
+
+        int highestBid = bidderRepository.findHighestBidPriceByProductId(productId)
+                .map(Long::intValue)
+                .orElse(product.getMinPrice());
+
+        LocalDateTime deadline = product.getDeadline();
+        Duration duration = Duration.between(LocalDateTime.now(), deadline);
+
+        String timeRemaining = duration.isNegative() || duration.isZero()
+                ? "마감됨"
+                : duration.toHours() + "시간 " + duration.toMinutesPart() + "분";
+
+        return AuctionProductInfoResponse.builder()
+                .productId(product.getId())
+                .title(product.getTitle())
+                .description(product.getDescription())
+                .timeRemaining(timeRemaining)
+                .highestBid(highestBid)
+                .endTime(deadline.toString())
+                .build();
+    }
+
 }
