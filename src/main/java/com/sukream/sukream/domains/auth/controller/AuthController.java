@@ -33,7 +33,7 @@ public class AuthController {
              아이디, 비밀번호로 로그인 한다.
             """)
     @PostMapping("/login")
-    public TokenResponse doLogin(HttpServletResponse response, LoginRequest loginRequest) {
+    public TokenResponse doLogin(HttpServletResponse response, @RequestBody LoginRequest loginRequest) {
         return authService.login(response, loginRequest);
     }
 
@@ -44,7 +44,7 @@ public class AuthController {
              아이디, 비밀번호로 회원가입 한다.
             """)
     @PostMapping("/signin")
-    public TokenResponse doSignIn(HttpServletResponse response, SignInRequest signInRequest) {
+    public TokenResponse doSignIn(HttpServletResponse response, @RequestBody SignInRequest signInRequest) {
         return authService.signIn(response, signInRequest);
     }
 
