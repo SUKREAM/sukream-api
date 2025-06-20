@@ -29,4 +29,7 @@ public interface BidderRepository extends JpaRepository<Bidder, Long> {
 
     // 입찰 수 계산
     int countByProduct_Id(Long productId);
+
+    // 최고 입찰자 1명 조회 (가격 내림차순 정렬)
+    Optional<Bidder> findTopByProduct_IdAndStatusOrderByPriceDesc(Long productId, BidderStatus status);
 }
