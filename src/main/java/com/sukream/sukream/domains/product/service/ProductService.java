@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -62,8 +63,9 @@ public class ProductService {
         }
         // 입찰 수 실시간 조회
         int bidCount = bidderRepository.countByProduct_Id(id);
+        Optional<Long> highestBid = bidderRepository.findHighestBidPriceByProductId(id);
 
-        return ProductResponse.fromEntityAndBidCount(product, bidCount);
+        return ProductResponse.fromEntityAndBidCountAndHighestPrice(product, bidCount, highestBid.orElse(null));
     }
 
     // 카테고리 별 상품 목록 조회 및 정렬
