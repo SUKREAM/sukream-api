@@ -9,6 +9,8 @@ import com.sukream.sukream.domains.bidder.dto.response.BidderResponse;
 import com.sukream.sukream.domains.bidder.entity.Bidder;
 import com.sukream.sukream.domains.bidder.exception.*;
 import com.sukream.sukream.domains.bidder.service.BidderService;
+import com.sukream.sukream.domains.product.dto.AuctionProductInfoResponse;
+import com.sukream.sukream.domains.product.service.ProductService;
 import com.sukream.sukream.domains.user.domain.dto.UserPrincipal;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,13 @@ import java.util.List;
 public class BidderController {
 
     private final BidderService bidderService;
+    private final ProductService productService;
+
+    @GetMapping("/product-info")
+    public ResponseEntity<?> getAuctionProductInfo(@PathVariable("productId") Long productId) {
+        AuctionProductInfoResponse response = productService.getAuctionProductInfo(productId);
+        return ResponseEntity.ok(DataResponse.success(response, SuccessCode.PRODUCT_READ_SUCCESS));
+    }
 
     @Operation(summary = "입찰자 목록 조회", description = "상품에 입찰한 모든 입찰자를 조회한다.")
     @GetMapping
