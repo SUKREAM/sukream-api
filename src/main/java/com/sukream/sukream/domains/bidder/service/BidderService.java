@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -150,6 +151,35 @@ public class BidderService {
         bidder.award();
         product.awardAuction(); // product status 변경
         return bidder;
+    }
+
+    @Transactional
+    public void awardHighestBidder(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(BidInvalidProductException::new);
+
+        // 입찰 가능한 상태가 아니면 종료
+        if (product.getStatus() != ProductStatus.OPEN || product.getBidDeadline() == null) {
+            return;
+        }
+
+        // 아직 마감 시간이 지나지 않았으면 아무것도 안 함
+        if (product.getBidDeadline().isAfter(LocalDateTime.now())) {
+            return;
+        }
+
+        // 최고 입찰자 조회 (상태: PENDING)
+        Optional<Bidder> highestBidder = bidderRepository.findTopByProduct_IdAndStatusOrderByPriceDesc(productId, BidderStatus.PENDING);
+
+        if (highestBidder.isPresent()) {
+            // 낙찰 처리
+            Bidder bidder = highestBidder.get();
+            bidder.award(); // -> BidderStatus.AWARDED
+            product.awardAuction(); // -> ProductStatus.AWARDED
+        } else {
+            // 유찰 처리 (입찰자가 없는 경우)
+            product.closeAuction(); // -> ProductStatus.CLOSED
+        }
     }
 
     public AwardedBidderResponse toAwardedResponse(Bidder bidder) {
