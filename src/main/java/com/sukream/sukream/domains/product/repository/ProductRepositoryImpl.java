@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sukream.sukream.domains.product.dto.ProductResponse;
 import com.sukream.sukream.domains.product.entity.QProduct;
 import com.sukream.sukream.domains.bidder.entity.QBidder;
+import com.sukream.sukream.domains.user.domain.entity.QUsers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -24,13 +25,14 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
     private List<ProductResponse> findProductsWithBidCountAndSort(String category, String sort) {
         QProduct product = QProduct.product;
         QBidder bidder = QBidder.bidder;
+        QUsers owner = product.owner;
 
         var bidCountExpr = bidder.count();
 
-        // image 필드는 제외하고 필요한 필드만 select
         var query = queryFactory.select(
                         product.id,
-                        product.owner.id,
+                        owner.id,
+                        owner.name,
                         product.title,
                         product.description,
                         product.minPrice,
@@ -41,7 +43,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                         product.updatedAt,
                         product.deadline,
                         product.chatLink,
-                        product.status.stringValue(),  // enum -> string
+                        product.status.stringValue(),
                         product.auctionNum,
                         bidCountExpr
                 )
@@ -63,7 +65,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                 product.description,
                 product.maxPrice,
                 product.minPrice,
-                product.owner.id,
+                owner.id,
+                owner.name,
                 product.status,
                 product.title,
                 product.updatedAt
@@ -80,7 +83,8 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
         return results.stream()
                 .map(tuple -> {
                     Long id = tuple.get(product.id);
-                    Long ownerId = tuple.get(product.owner.id);
+                    Long ownerId = tuple.get(owner.id);
+                    String ownerName = tuple.get(owner.name);
                     String title = tuple.get(product.title);
                     String description = tuple.get(product.description);
                     Integer minPriceObj = tuple.get(product.minPrice);
@@ -99,12 +103,12 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
                     Long bidCountLong = tuple.get(bidCountExpr);
                     int bidCount = bidCountLong != null ? bidCountLong.intValue() : 0;
 
-                    // image는 DB BLOB이므로 목록에서는 null 처리 (필요 시 상세 조회에서 따로 처리)
-                    String image = null;
+                    String image = null; // 목록에서는 이미지 null 처리
 
                     return ProductResponse.builder()
                             .id(id)
-                            .sellerId(ownerId) // 괄호 수정
+                            .sellerId(ownerId)
+                            .sellerName(ownerName)
                             .title(title)
                             .description(description)
                             .minPrice(minPrice)
