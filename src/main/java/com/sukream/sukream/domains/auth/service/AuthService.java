@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -42,6 +43,9 @@ public class AuthService {
     private final MessageDelegate messageDelegate;
     private final EmailClient emailClient;
     private final SignInMapper signInMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthDelegate authDelegate;
+
 
     public HttpStatus findEmail(String phoneNumber) {
         return messageDelegate.sendSMS(phoneNumber);
@@ -54,17 +58,21 @@ public class AuthService {
 
 
     public TokenResponse login(HttpServletResponse response, LoginRequest request){
-        Users usersInfo = userInfoRepository.findUsersByEmail(request.getEmail()).get();
-        return this.makeToken(response, usersInfo);
+        Users userInfo = userInfoRepository.findUsersByEmail(request.getEmail())
+                .filter(m -> passwordEncoder.matches(request.getPw(), m.getPassword()))
+                .orElseThrow(IllegalArgumentException::new);
+
+        return this.makeToken(response, userInfo);
     }
 
     public TokenResponse signIn(HttpServletResponse response, SignInRequest signInRequest){
+        signInRequest.setPassword((authDelegate.passwordEncoding(signInRequest.getPassword())));
+
         Users users = signInMapper.toEntity(signInRequest);
         if(users != null) {
             userInfoRepository.save(users);
         }
 
-        // TODO: Exception 로직 추가
         return this.makeToken(response, Objects.requireNonNull(users));
     }
 
