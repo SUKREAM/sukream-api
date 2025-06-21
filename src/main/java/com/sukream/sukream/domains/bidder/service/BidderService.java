@@ -99,7 +99,7 @@ public class BidderService {
             throw new BidDeadlineExceededException();
         }
 
-        // 입찰 이미 했는지 확인 (예시)
+        // 중복 입찰 방지
         boolean alreadyBid = bidderRepository.existsByProductAndUser(product, user);
         if (alreadyBid) {
             throw new BidAlreadyPlacedException();
@@ -119,6 +119,8 @@ public class BidderService {
             throw new BidInvalidAmountException();
         }
 
+        String nickname = user.getName();
+
         // 입찰 생성
         Bidder bidder = Bidder.builder()
                 .product(product)
@@ -126,7 +128,7 @@ public class BidderService {
                 .price(bidRequest.getPrice())
                 .status(BidderStatus.PENDING)
                 .bidAt(LocalDateTime.now())
-                .nickname(bidRequest.getNickname())
+                .nickname(nickname)
                 .build();
 
         return bidderRepository.save(bidder);
