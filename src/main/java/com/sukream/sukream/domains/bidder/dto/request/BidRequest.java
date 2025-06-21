@@ -11,5 +11,4 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BidRequest {
     private int price;
-    private String nickname;
 }
