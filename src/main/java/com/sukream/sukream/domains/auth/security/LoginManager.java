@@ -9,6 +9,7 @@ import java.util.Objects;
 
 import static com.sukream.sukream.commons.constants.AuthConstants.ANONYMOUS_USER;
 
+
 public class LoginManager {
 
     public static UserPrincipal getUserDetails() {

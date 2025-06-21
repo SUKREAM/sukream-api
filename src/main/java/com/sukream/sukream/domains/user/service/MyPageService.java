@@ -1,6 +1,7 @@
 package com.sukream.sukream.domains.user.service;
 
 import com.sukream.sukream.domains.auth.repository.UserInfoRepository;
+import com.sukream.sukream.domains.auth.security.LoginManager;
 import com.sukream.sukream.domains.user.domain.entity.Users;
 import com.sukream.sukream.domains.user.domain.request.UserRequest;
 import com.sukream.sukream.domains.user.domain.response.UserResponse;
@@ -17,7 +18,7 @@ public class MyPageService {
     private final UserResponseMapper userResponseMapper;
 
     public UserResponse myPage(UserRequest userRequest){
-        Users userInfo = userRequestMapper.toEntity(userRequest);
+        Users userInfo = LoginManager.getUserDetails().getUser();
         userInfo.updateUserInfo(userRequest);
 
         return userResponseMapper.toDto(userInfo);
