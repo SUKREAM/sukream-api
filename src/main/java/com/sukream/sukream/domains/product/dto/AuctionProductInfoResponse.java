@@ -12,4 +12,5 @@ public class AuctionProductInfoResponse {
     private String timeRemaining;
     private int highestBid;
     private String endTime;
+    private String image;
 }

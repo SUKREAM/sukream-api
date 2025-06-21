@@ -133,6 +133,11 @@ public class ProductService {
                 ? "마감됨"
                 : duration.toHours() + "시간 " + duration.toMinutesPart() + "분";
 
+        String base64Image = null;
+        if (product.getImage() != null) {
+            base64Image = Base64.getEncoder().encodeToString(product.getImage());
+        }
+
         return AuctionProductInfoResponse.builder()
                 .productId(product.getId())
                 .title(product.getTitle())
@@ -140,6 +145,7 @@ public class ProductService {
                 .timeRemaining(timeRemaining)
                 .highestBid(highestBid)
                 .endTime(deadline.toString())
+                .image(base64Image)
                 .build();
     }
 
