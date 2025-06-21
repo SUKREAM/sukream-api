@@ -29,7 +29,7 @@ public class BidderController {
     private final BidderService bidderService;
     private final ProductService productService;
 
-    @GetMapping("/product-info")
+    @GetMapping("/info")
     public ResponseEntity<?> getAuctionProductInfo(@PathVariable("productId") Long productId) {
         AuctionProductInfoResponse response = productService.getAuctionProductInfo(productId);
         return ResponseEntity.ok(DataResponse.success(response, SuccessCode.PRODUCT_READ_SUCCESS));
