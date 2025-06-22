@@ -157,6 +157,16 @@ public class AuthService {
         return this.makeToken(response, Objects.requireNonNull(users));
     }
 
+    private String createRandomPhoneNumber() {
+        Random rand = new Random();
+
+        String middle = String.format("%04d", rand.nextInt(10000)); // 0000 ~ 9999
+        String last = String.format("%04d", rand.nextInt(10000));   // 0000 ~ 9999
+
+        return "010-" + middle + "-" + last;
+    }
+
+
 
     public Response doVerification(HttpServletResponse response, String provider, String code) {
         SocialOAuthProviderConfig config = getConfig(provider);
@@ -229,22 +239,26 @@ public class AuthService {
         String email;
         String oauthId;
         String name;
+        String phone;
 
         switch (provider) {
             case GOOGLE -> {
                 email = oAuthResponse.getEmail();
                 oauthId = oAuthResponse.getId();
                 name = oAuthResponse.getName();
+                phone = this.createRandomPhoneNumber();
             }
             case NAVER -> {
                 email = oAuthResponse.getResponse().getEmail();
                 oauthId = oAuthResponse.getResponse().getId();
                 name = oAuthResponse.getResponse().getName();
+                phone = oAuthResponse.getResponse().getMobile();
             }
             case KAKAO -> {
                 email = oAuthResponse.getKakao_account().getEmail();
                 oauthId = oAuthResponse.getId();
                 name = oAuthResponse.getProperties().getNickname();
+                phone = this.createRandomPhoneNumber();
             }
             default -> throw new RuntimeException("Unsupported provider");
         }
@@ -257,7 +271,7 @@ public class AuthService {
                             .name(name)
                             .email(email)
                             .password(authDelegate.passwordEncoding(pw))
-                            .phoneNumber("000-0000-0000")
+                            .phoneNumber(phone)
                             .oauthProvider(provider)
                             .oauthId(oauthId)
                             .roles(Set.of(USER))
