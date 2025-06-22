@@ -1,9 +1,12 @@
 package com.sukream.sukream.domains.auth.service;
 
+import com.sukream.sukream.commons.config.security.SocialOAuthProviderConfig;
+import com.sukream.sukream.commons.constants.AuthConstants;
 import com.sukream.sukream.commons.domain.response.Response;
 import com.sukream.sukream.domains.auth.domain.request.LoginRequest;
 import com.sukream.sukream.domains.auth.domain.request.SignInRequest;
 import com.sukream.sukream.domains.auth.domain.response.SocialOAuthResponse;
+import com.sukream.sukream.domains.auth.domain.response.SocialTokenResponse;
 import com.sukream.sukream.domains.auth.domain.response.TokenResponse;
 import com.sukream.sukream.domains.auth.mapper.SignInMapper;
 import com.sukream.sukream.domains.auth.repository.UserInfoRepository;
@@ -15,16 +18,24 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.sukream.sukream.commons.constants.AuthConstants.*;
@@ -45,6 +56,41 @@ public class AuthService {
     private final SignInMapper signInMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuthDelegate authDelegate;
+
+    @Value("${naver.client-id}")
+    private String naverClientId;
+
+    @Value("${naver.client-secret}")
+    private String naverClientSecret;
+
+    @Value("${google.client-id}")
+    private String googleClientId;
+
+    @Value("${google.client-secret}")
+    private String googleClientSecret;
+
+    @Value("${kakao.client-id}")
+    private String kakaoClientId;
+
+    @Value("${redirect-uri}")
+    private String redirectUri;
+
+
+    private SocialOAuthProviderConfig getConfig(String provider) {
+        return switch (provider) {
+            case GOOGLE -> new SocialOAuthProviderConfig(
+                    googleClientId, googleClientSecret, redirectUri,
+                    GOOGLE_TOKEN_URL, GOOGLE_VALIDATE_URL);
+            case NAVER -> new SocialOAuthProviderConfig(
+                    naverClientId, naverClientSecret, redirectUri,
+                    NAVER_TOKEN_URL, NAVER_VALIDATE_URL);
+            case KAKAO -> new SocialOAuthProviderConfig(
+                    kakaoClientId, null, redirectUri,
+                    KAKAO_TOKEN_URL, KAKO_VALIDATE_URL);
+            default -> throw new RuntimeException("Unsupported provider");
+        };
+    }
+
 
 
     public HttpStatus findEmail(String phoneNumber) {
@@ -77,54 +123,108 @@ public class AuthService {
     }
 
 
-    public Response doVerification(HttpServletResponse response, String provider, String accessToken){
+    public Response doVerification(HttpServletResponse response, String provider, String code) {
+        SocialOAuthProviderConfig config = getConfig(provider);
+        if (config == null) throw new RuntimeException("Unsupported provider");
 
-        String baseUrl;
-        switch (provider) {
-            case GOOGLE -> baseUrl = GOOGLE_VALIDATE_URL;
-            case NAVER -> baseUrl = NAVER_VALIDATE_URL;
-            default -> throw new RuntimeException();
-        }
-
-        WebClient webClient = WebClient.builder()
-                .baseUrl(baseUrl)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        // 1. Access Token 요청
+        WebClient tokenClient = WebClient.builder()
+                .baseUrl(config.getTokenUrl())
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .build();
 
-        AtomicReference<Response> errorResponse = new AtomicReference<>(new Response());
-        SocialOAuthResponse oAuthResponse =
-                webClient
-                        .get()
-                        .header(AUTHORIZATION, BEARER + accessToken)
-                        .retrieve()
-                        .bodyToMono(SocialOAuthResponse.class)
-                        .onErrorResume(error -> {
-                            if (error instanceof WebClientResponseException ex) {
-                                errorResponse.set(Response.error(ex.getStatusCode().is4xxClientError() ? RESOURCE_NOT_FOUND : ERR_UNKNOWN));
-                            }
-                            return Mono.empty();
-                        })
-                        .block();
+        String decode = URLDecoder.decode(code, StandardCharsets.UTF_8);
 
-        if(!errorResponse.get().isSuccess())
-            return errorResponse.get();
 
-        Users usersInfo;
-        assert oAuthResponse != null;
-        switch (provider) {
-            case GOOGLE -> usersInfo = userInfoRepository.findUsersByEmail(oAuthResponse.getEmail()).get();
-            case NAVER -> {
-                assert oAuthResponse.getResponse() != null;
-                usersInfo = userInfoRepository.findUsersByEmail(oAuthResponse.getResponse().getEmail()).get();
-            }
-            default -> throw new RuntimeException();
+        SocialTokenResponse tokenResponse = tokenClient
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam(GRANT_TYPE, AUTHENTICATION_CODE)
+                        .queryParam(CODE, decode)
+                        .queryParam(CLIENT_ID, config.getClientId())
+                        .queryParam(CLIENT_SECRET, config.getClientSecret())
+                        .queryParam(REDIRECT_URI, config.getRedirectUri())
+                        .build())
+                .exchangeToMono(clientResponse -> {
+                    if (clientResponse.statusCode().isError()) {
+                        return clientResponse.bodyToMono(String.class)
+                                .flatMap(errorBody -> {
+                                    log.error("OAuth token request failed with status: {}, body: {}",
+                                            clientResponse.statusCode(), errorBody);
+                                    return Mono.error(new RuntimeException("OAuth 토큰 요청 실패: " + errorBody));
+                                });
+                    } else {
+                        return clientResponse.bodyToMono(SocialTokenResponse.class);
+                    }
+                })
+                .block();
+
+        if (tokenResponse == null || tokenResponse.getAccess_token() == null) {
+            return Response.error(ERR_UNKNOWN);
         }
 
-        if (usersInfo == null)
-            return Response.error(RESOURCE_NOT_FOUND);
+        String accessToken = tokenResponse.getAccess_token();
 
-        return this.makeToken(response, usersInfo);
+        // 2. 사용자 정보 요청
+        WebClient userClient = WebClient.builder()
+                .baseUrl(config.getUserInfoUrl())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, BEARER + accessToken)
+                .build();
+
+        SocialOAuthResponse oAuthResponse = userClient
+                .get()
+                .retrieve()
+                .bodyToMono(SocialOAuthResponse.class)
+                .onErrorResume(error -> Mono.empty())
+                .block();
+
+        if (oAuthResponse == null) {
+            return Response.error(RESOURCE_NOT_FOUND);
+        }
+
+        // 3. 이메일 식별자 추출
+        String email;
+        String oauthId;
+        String name;
+
+        switch (provider) {
+            case GOOGLE -> {
+                email = oAuthResponse.getEmail();
+                oauthId = oAuthResponse.getId();
+                name = oAuthResponse.getName();
+            }
+            case NAVER -> {
+                email = oAuthResponse.getResponse().getEmail();
+                oauthId = oAuthResponse.getResponse().getId();
+                name = oAuthResponse.getResponse().getName();
+            }
+            case KAKAO -> {
+                email = oAuthResponse.getKakao_account().getEmail();
+                oauthId = oAuthResponse.getId();
+                name = oAuthResponse.getProperties().getNickname();
+            }
+            default -> throw new RuntimeException("Unsupported provider");
+        }
+
+        // 4. 사용자 조회 또는 등록
+        Users user = userInfoRepository.findUsersByEmail(email)
+                .orElseGet(() -> {
+                    Users newUser = Users.builder()
+                            .name(name)
+                            .email(email)
+                            .password(UUID.randomUUID().toString()) // 더미
+                            .phoneNumber("000-0000-0000")
+                            .oauthProvider(provider)
+                            .oauthId(oauthId)
+                            .roles(Set.of(USER))
+                            .build();
+                    return userInfoRepository.save(newUser);
+                });
+
+        // 5. 토큰 발급
+        return this.makeToken(response, user);
     }
+
 
     private TokenResponse makeToken(HttpServletResponse response, Users usersInfo){
         Claims claims = Jwts.claims().setSubject(usersInfo.getEmail());

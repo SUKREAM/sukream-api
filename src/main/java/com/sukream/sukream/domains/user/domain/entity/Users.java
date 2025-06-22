@@ -50,6 +50,14 @@ public class Users extends BaseTimeEntity {
     @Comment("사용자 계정 활성화 여부")
     private boolean isActive;
 
+    @Column(name = "oauth_provider")
+    @Comment("OAuth 제공자 (GOOGLE, NAVER, KAKAO 등)")
+    private String oauthProvider;
+
+    @Column(name = "oauth_id")
+    @Comment("OAuth 사용자 식별자")
+    private String oauthId;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "role")

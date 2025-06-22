@@ -1,5 +1,7 @@
 package com.sukream.sukream.domains.auth.domain.response;
 
+import com.sukream.sukream.domains.auth.domain.response.KakaoOAuthResponse.KakaoAccount;
+import com.sukream.sukream.domains.auth.domain.response.KakaoOAuthResponse.KakaoProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,5 +24,9 @@ public class SocialOAuthResponse {
 
     // naver
     private NaverOAuthResponse response;
+
+    //kakao
+    private KakaoAccount kakao_account;
+    private KakaoProperties properties;
 
 }

@@ -113,6 +113,9 @@ dependencies {
 
     implementation 'net.nurigo:javaSDK:2.2'
 
+    // netty
+    implementation 'io.netty:netty-resolver-dns-native-macos:4.1.94.Final:osx-aarch_64'
+
 }
 
 def generatedFilesBaseDir = "${projectDir}/src/generated"
