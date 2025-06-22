@@ -10,6 +10,7 @@ import com.sukream.sukream.domains.user.mapper.UserRequestMapper;
 import com.sukream.sukream.domains.user.mapper.UserResponseMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.sonatype.plexus.components.sec.dispatcher.PasswordDecryptor;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -26,9 +27,15 @@ public class MyPageService {
     public UserResponse myPage(UserRequest userRequest){
         Users userInfo = userInfoRepository.findById(Objects.requireNonNull(LoginManager.getUserDetails()).getUser().getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        userRequest.setPassword((authDelegate.passwordEncoding(userRequest.getPassword())));
 
-        userInfo.updateUserInfo(userRequest);
+        String pw = userRequest.getPassword();
+        if (pw != null && !pw.isBlank() && !pw.equals("1234")) {
+            String encodedPassword = authDelegate.passwordEncoding(userRequest.getPassword());
+            userRequest.setPassword(encodedPassword);
+            userInfo.updateUserInfo(userRequest);
+        } else  {
+            userInfo.updateUserInfoExceptPassword(userRequest);
+        }
 
         return userResponseMapper.toDto(userInfo);
     }
