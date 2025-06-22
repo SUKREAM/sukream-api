@@ -24,7 +24,6 @@ public class AuthConstants {
     // kakao
     public static final String KAKAO = "kakao";
     public static final String KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token";
-    public static final String KAKO_VALIDATE_URL = "https://kauth.kakao.com/oauth/authorize";
     public static final String KAKAO_USER_INFO_URL = "https://kapi.kakao.com/v2/user/me";
 
 

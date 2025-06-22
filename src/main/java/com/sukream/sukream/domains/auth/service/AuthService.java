@@ -86,7 +86,7 @@ public class AuthService {
                     NAVER_TOKEN_URL, NAVER_VALIDATE_URL);
             case KAKAO -> new SocialOAuthProviderConfig(
                     kakaoClientId, null, redirectUri,
-                    KAKAO_TOKEN_URL, KAKO_VALIDATE_URL);
+                    KAKAO_TOKEN_URL, KAKAO_USER_INFO_URL);
             default -> throw new RuntimeException("Unsupported provider");
         };
     }
@@ -174,9 +174,17 @@ public class AuthService {
         SocialOAuthResponse oAuthResponse = userClient
                 .get()
                 .retrieve()
+                .onStatus(status -> status.isError(), clientResponse -> {
+                    return clientResponse.bodyToMono(String.class)
+                            .map(errorBody -> {
+                                log.error("OAuth user info error response: {}", errorBody);
+                                return new RuntimeException("User info request failed: " + errorBody);
+                            })
+                            .flatMap(Mono::error);
+                })
                 .bodyToMono(SocialOAuthResponse.class)
-                .onErrorResume(error -> Mono.empty())
                 .block();
+
 
         if (oAuthResponse == null) {
             return Response.error(RESOURCE_NOT_FOUND);
