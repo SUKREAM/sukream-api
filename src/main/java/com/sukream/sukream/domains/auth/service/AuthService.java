@@ -16,6 +16,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -128,6 +129,7 @@ public class AuthService {
         return messageDelegate.sendSMS(phoneNumber);
     }
 
+    @Transactional
     public HttpStatus findPassword(String email){
         Users userInfo = userInfoRepository.findUsersByEmail(email).get();
         String pw = createSecureRandomPassword();
