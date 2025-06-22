@@ -32,4 +32,10 @@ public class MyPageService {
 
         return userResponseMapper.toDto(userInfo);
     }
+
+    public UserResponse getUserInfo(){
+        Users userInfo = userInfoRepository.findById(Objects.requireNonNull(LoginManager.getUserDetails()).getUser().getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return userResponseMapper.toDto(userInfo);
+    }
 }
