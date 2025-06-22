@@ -31,7 +31,7 @@ public class ReviewController {
 
 
     @GetMapping("/users/{userId}/reviews")
-    public ReceivedReviewSummaryResponse getUserReceivedReviews(@PathVariable Long userId) {
+    public ReceivedReviewSummaryResponse getUserReceivedReviews(@PathVariable("userId") Long userId) {
         return reviewService.getReceivedReviewsByUserId(userId);
     }
 }

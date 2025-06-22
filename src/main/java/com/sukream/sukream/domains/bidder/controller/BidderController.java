@@ -37,7 +37,7 @@ public class BidderController {
 
     @Operation(summary = "입찰자 목록 조회", description = "상품에 입찰한 모든 입찰자를 조회한다.")
     @GetMapping
-    public ResponseEntity<?> getBidders(@PathVariable Long productId,
+    public ResponseEntity<?> getBidders(@PathVariable("productId") Long productId,
                                         @AuthenticationPrincipal UserPrincipal userPrincipal) {
         try {
             String userEmail = userPrincipal.getUsername();
@@ -55,7 +55,7 @@ public class BidderController {
 
     @Operation(summary = "입찰하기", description = "소비자가 상품에 대해 입찰한다.")
     @PostMapping
-    public ResponseEntity<?> placeBid(@PathVariable Long productId,
+    public ResponseEntity<?> placeBid(@PathVariable("productId") Long productId,
                                       @RequestBody BidRequest bidRequest,
                                       @AuthenticationPrincipal UserPrincipal userPrincipal) {
         try {
@@ -87,8 +87,8 @@ public class BidderController {
 
     @Operation(summary = "낙찰자 지정", description = "판매자가 특정 입찰자를 낙찰자로 지정한다.")
     @PostMapping("/award/{bidderId}")
-    public ResponseEntity<?> awardBidder(@PathVariable Long productId,
-                                         @PathVariable Long bidderId,
+    public ResponseEntity<?> awardBidder(@PathVariable("productId") Long productId,
+                                         @PathVariable("bidderId") Long bidderId,
                                          @AuthenticationPrincipal UserPrincipal userPrincipal) {
         try {
             String userEmail = userPrincipal.getUsername();
