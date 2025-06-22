@@ -22,7 +22,7 @@ public class EmailClient {
 
             // 수신자, 제목, 본문 등 설정
             String subject = "SUKREAM 비밀번호 안내";
-            String body = "귀하의 비밀번호는 "+ password + " 입니다.";
+            String body = "귀하의 임시 비밀번호는 "+ password + " 입니다.";
 
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
             mimeMessageHelper.setTo(email);

@@ -32,11 +32,12 @@ import reactor.core.publisher.Mono;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.security.SecureRandom;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.sukream.sukream.commons.constants.AuthConstants.*;
 import static com.sukream.sukream.commons.constants.CommonConstants.NAME;
@@ -91,6 +92,36 @@ public class AuthService {
         };
     }
 
+    private String createSecureRandomPassword() {
+        final String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        final String lower = "abcdefghijklmnopqrstuvwxyz";
+        final String digits = "0123456789";
+        final String symbols = "!@#$%^&*()_+";
+        final String allChars = upper + lower + digits + symbols;
+
+        SecureRandom random = new SecureRandom();
+
+        // 필수 조건 문자 1개씩
+        List<Character> passwordChars = Stream.of(
+                upper.charAt(random.nextInt(upper.length())),
+                lower.charAt(random.nextInt(lower.length())),
+                digits.charAt(random.nextInt(digits.length())),
+                symbols.charAt(random.nextInt(symbols.length()))
+        ).collect(Collectors.toCollection(ArrayList::new));
+
+        // 나머지 랜덤 문자 추가
+        int totalLength = random.nextInt(8) + 8;
+        IntStream.range(0, totalLength - 4)
+                .mapToObj(i -> allChars.charAt(random.nextInt(allChars.length())))
+                .forEach(passwordChars::add);
+
+        // 셔플 & 문자열 변환
+        Collections.shuffle(passwordChars, random);
+
+        return passwordChars.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining());
+    }
 
 
     public HttpStatus findEmail(String phoneNumber) {
@@ -99,7 +130,9 @@ public class AuthService {
 
     public HttpStatus findPassword(String email){
         Users userInfo = userInfoRepository.findUsersByEmail(email).get();
-        return emailClient.sendOneEmail(userInfo.getEmail(), userInfo.getPassword());
+        String pw = createSecureRandomPassword();
+        userInfo.updatePassword((authDelegate.passwordEncoding(createSecureRandomPassword())));
+        return emailClient.sendOneEmail(userInfo.getEmail(), pw);
     }
 
 

@@ -76,6 +76,10 @@ public class Users extends BaseTimeEntity {
         this.password = userRequest.getPassword();
     }
 
+    public void updatePassword(String pw) {
+        this.password = pw;
+    }
+
     public void updateUserInfoExceptPassword(UserRequest userRequest) {
         this.name = userRequest.getName();
         this.email = userRequest.getEmail();
