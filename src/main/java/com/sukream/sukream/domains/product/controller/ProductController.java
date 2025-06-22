@@ -46,7 +46,7 @@ public class ProductController {
     // 상품 단건 조회
     @Operation(summary = "상품 상세 조회", description = "상품을 id로 상세 조회한다.")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getProductById(@PathVariable Long id) {
+    public ResponseEntity<?> getProductById(@PathVariable("id") Long id) {
         try {
             ProductResponse responseDto = productService.getProduct(id);
             return ResponseEntity.ok(DataResponse.success(responseDto, SuccessCode.PRODUCT_READ_SUCCESS));
@@ -61,8 +61,8 @@ public class ProductController {
     @Operation(summary = "상품 목록 조회", description = "상품을 인기순, 등록순 정렬하고 카테고리별 조회한다.")
     @GetMapping
     public ResponseEntity<?> getProductsByCategoryAndSort(
-            @RequestParam(required = false) String category,
-            @RequestParam(defaultValue = "latest") String sort
+            @RequestParam(name="category", required = false) String category,
+            @RequestParam(name= "sort", defaultValue = "latest") String sort
     ) {
         try {
             List<ProductResponse> products = productService.getAllProducts(category, sort);
@@ -77,7 +77,7 @@ public class ProductController {
     // 상품 수정
     @Operation(summary = "상품 수정", description = "title, description, minPrice, maxPrice, category, bidUnit, deadline, image, chatLink를 수정한다.")
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateProduct(@PathVariable Long id,
+    public ResponseEntity<?> updateProduct(@PathVariable("id") Long id,
                                            @RequestBody UpdateProductRequest requestDto,
                                            @AuthenticationPrincipal UserPrincipal userPrincipal) {
         try {
@@ -99,7 +99,7 @@ public class ProductController {
     // 상품 삭제
     @Operation(summary = "상품 삭제", description = "상품을 삭제한다.")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProduct(@PathVariable Long id,
+    public ResponseEntity<?> deleteProduct(@PathVariable("id") Long id,
                                            @AuthenticationPrincipal UserPrincipal userPrincipal)  {
         try {
             // 로그인한 사용자가 해당 상품의 소유자인지 검증

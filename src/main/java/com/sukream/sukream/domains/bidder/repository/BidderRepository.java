@@ -4,7 +4,7 @@ import com.sukream.sukream.domains.bidder.entity.Bidder;
 import com.sukream.sukream.domains.bidder.entity.BidderStatus;
 import com.sukream.sukream.domains.product.entity.Product;
 import com.sukream.sukream.domains.user.domain.entity.Users;
-import feign.Param;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
