@@ -27,12 +27,12 @@ public class Users extends BaseTimeEntity {
     private String name;
 
     @NotNull
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", nullable = false, unique = true)
     @Comment("사용자 이메일")
     private String email;
 
     @NotNull
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number", nullable = false, unique = true)
     @Comment("사용자 전화번호")
     private String phoneNumber;
 
