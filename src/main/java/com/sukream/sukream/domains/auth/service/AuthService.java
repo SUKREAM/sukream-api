@@ -133,7 +133,7 @@ public class AuthService {
     public HttpStatus findPassword(String email){
         Users userInfo = userInfoRepository.findUsersByEmail(email).get();
         String pw = createSecureRandomPassword();
-        userInfo.updatePassword((authDelegate.passwordEncoding(createSecureRandomPassword())));
+        userInfo.updatePassword(authDelegate.passwordEncoding(pw));
         return emailClient.sendOneEmail(userInfo.getEmail(), pw);
     }
 
@@ -250,12 +250,13 @@ public class AuthService {
         }
 
         // 4. 사용자 조회 또는 등록
+        String pw = createSecureRandomPassword();
         Users user = userInfoRepository.findUsersByEmail(email)
                 .orElseGet(() -> {
                     Users newUser = Users.builder()
                             .name(name)
                             .email(email)
-                            .password(UUID.randomUUID().toString()) // 더미
+                            .password(authDelegate.passwordEncoding(pw))
                             .phoneNumber("000-0000-0000")
                             .oauthProvider(provider)
                             .oauthId(oauthId)
@@ -263,6 +264,8 @@ public class AuthService {
                             .build();
                     return userInfoRepository.save(newUser);
                 });
+
+        emailClient.sendOneEmail(email, pw);
 
         // 5. 토큰 발급
         return this.makeToken(response, user);
